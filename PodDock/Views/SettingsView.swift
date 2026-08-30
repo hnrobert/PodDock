@@ -9,7 +9,7 @@ struct SettingsView: View {
 
   var body: some View {
     Form {
-      Section("账户") {
+      Section("Accounts") {
         ForEach(environment.accounts) { account in
           HStack {
             Image(
@@ -20,39 +20,39 @@ struct SettingsView: View {
             .foregroundStyle(.green)
             VStack(alignment: .leading, spacing: 2) {
               Text(account.label)
-              Text("Token ID \(account.loginTokenID) · \(account.apiFlavor == .legacy ? "传统 API" : "API 3.0")")
+              Text("Token ID \(account.loginTokenID) · \(account.apiFlavor == .legacy ? "Legacy API" : "API 3.0")")
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }
             Spacer()
             if account.id != environment.preferences.currentAccountID {
-              Button("切换") {
+              Button("Switch") {
                 Task { await environment.switchAccount(to: account.id) }
               }
             }
-            Button("删除", role: .destructive) {
+            Button("Remove", role: .destructive) {
               pendingRemove = account
             }
           }
         }
-        Button("添加账户…") { isShowingAdd = true }
+        Button("Add Account…") { isShowingAdd = true }
       }
 
-      Section("安全") {
-        Toggle("Face ID / Touch ID 应用锁", isOn: Binding(
+      Section("Security") {
+        Toggle("Face ID / Touch ID App Lock", isOn: Binding(
           get: { environment.preferences.appLockEnabled },
           set: { enabled in
             environment.preferences.appLockEnabled = enabled
             if !enabled { environment.lock.clearLock() }
           }
         ))
-        Text("开启后冷启动需验证身份;凭据本身始终加密存于本机 Keychain(不随设备迁移)。")
+        Text("Identity verification is required at cold start; credentials stay encrypted in the local Keychain and never sync.")
           .font(.caption)
           .foregroundStyle(.secondary)
       }
 
-      Section("解析检测") {
-        Picker("默认 DoH 服务商", selection: Binding(
+      Section("Propagation") {
+        Picker("Default DoH Provider", selection: Binding(
           get: { environment.preferences.preferredDoHProvider },
           set: { environment.preferences.preferredDoHProvider = $0 }
         )) {
@@ -60,15 +60,15 @@ struct SettingsView: View {
             Text(provider.displayName).tag(provider)
           }
         }
-        Text("DoH 不可达时自动回退系统解析,结果会标注来源。")
+        Text("Falls back to the system resolver when DoH is unreachable; results are labeled by source.")
           .font(.caption)
           .foregroundStyle(.secondary)
       }
 
-      Section("关于") {
-        LabeledContent("版本", value: "0.1.0")
-        LabeledContent("本地 MCP 服务", value: "M3 里程碑提供")
-        Link("DNSPod 控制台", destination: URL(string: "https://console.dnspod.cn")!)
+      Section("About") {
+        LabeledContent("Version", value: "0.1.0")
+        LabeledContent("Local MCP Service", value: "Coming in M3")
+        Link("DNSPod Console", destination: URL(string: "https://console.dnspod.cn")!)
       }
 
       if let message = environment.latestMessage {
@@ -81,26 +81,26 @@ struct SettingsView: View {
       AddAccountSheetEmbedded()
     }
     .confirmationDialog(
-      "删除账户",
+      "Remove Account",
       isPresented: Binding(
         get: { pendingRemove != nil },
         set: { if !$0 { pendingRemove = nil } }
       ),
       titleVisibility: .visible
     ) {
-      Button("删除 \(pendingRemove?.label ?? "")", role: .destructive) {
+      Button("Remove \(pendingRemove?.label ?? "")", role: .destructive) {
         if let account = pendingRemove {
           Task { await environment.removeAccount(account.id) }
         }
         pendingRemove = nil
       }
     } message: {
-      Text("仅从本机移除凭据,不影响 DNSPod 账号本身。")
+      Text("Only removes local credentials; your DNSPod account is untouched.")
     }
   }
 }
 
-/// 设置内嵌的添加账户(复用 AddAccountView 的核心表单,成功后留在设置页)
+/// 设置内嵌的添加账户(复用 AddAccountView,成功后留在设置页)
 private struct AddAccountSheetEmbedded: View {
   @Environment(\.dismiss) private var dismiss
 

@@ -19,12 +19,12 @@ struct DomainListView: View {
         }
         .tag(domain.id)
         .contextMenu {
-          Button(domain.state == .enable ? "暂停解析" : "启用解析") {
+          Button(domain.state == .enable ? "Pause DNS" : "Resume DNS") {
             Task { await model.toggle(domain) }
           }
           .disabled(domain.state == .spam || domain.state == .lock || domain.state == .unknown)
           Divider()
-          Button("删除域名…", role: .destructive) {
+          Button("Remove Domain…", role: .destructive) {
             pendingDelete = domain
           }
         }
@@ -37,49 +37,49 @@ struct DomainListView: View {
         ProgressView()
       }
     }
-    .navigationTitle("域名")
+    .navigationTitle("Domains")
     .searchable(text: Binding(
       get: { model.searchText },
       set: { model.searchText = $0 }
-    ), prompt: "搜索域名")
+    ), prompt: "Search domains")
     .toolbar {
       ToolbarItem(placement: .primaryAction) {
         Button {
           isShowingAdd = true
         } label: {
-          Label("添加域名", systemImage: "plus")
+          Label("Add Domain", systemImage: "plus")
         }
       }
       ToolbarItem(placement: .automatic) {
         Button {
           Task { await model.load() }
         } label: {
-          Label("刷新", systemImage: "arrow.clockwise")
+          Label("Refresh", systemImage: "arrow.clockwise")
         }
       }
     }
     .sheet(isPresented: $isShowingAdd) {
       AddDomainSheet()
     }
-    .alert("删除域名", isPresented: Binding(
+    .alert("Remove Domain", isPresented: Binding(
       get: { pendingDelete != nil },
       set: { if !$0 { pendingDelete = nil } }
     )) {
-      Button("删除", role: .destructive) {
+      Button("Remove", role: .destructive) {
         if let domain = pendingDelete {
           Task { await model.remove(domain) }
         }
         pendingDelete = nil
       }
-      Button("取消", role: .cancel) { pendingDelete = nil }
+      Button("Cancel", role: .cancel) { pendingDelete = nil }
     } message: {
-      Text("确定删除域名 \(pendingDelete?.name ?? "")?该域名的解析将一并失效。")
+      Text("Remove \(pendingDelete?.name ?? "")? Its records will stop resolving.")
     }
-    .alert("出错了", isPresented: Binding(
+    .alert("Error", isPresented: Binding(
       get: { model.errorMessage != nil },
       set: { if !$0 { model.errorMessage = nil } }
     )) {
-      Button("好", role: .cancel) { model.errorMessage = nil }
+      Button("OK", role: .cancel) { model.errorMessage = nil }
     } message: {
       Text(model.errorMessage ?? "")
     }
@@ -95,7 +95,7 @@ private struct DomainRowView: View {
       VStack(alignment: .leading, spacing: 3) {
         Text(domain.name).font(.body.weight(.medium)).textSelection(.enabled)
         HStack(spacing: 8) {
-          Text("\(domain.recordCount) 条记录")
+          Text("\(domain.recordCount) records")
           Text(domain.grade).foregroundStyle(.secondary)
           if !domain.updatedOn.isEmpty {
             Text(domain.updatedOn).foregroundStyle(.tertiary)
@@ -114,7 +114,7 @@ private struct DomainRowView: View {
       .toggleStyle(.switch)
       .labelsHidden()
       .disabled(domain.state == .spam || domain.state == .lock || domain.state == .unknown)
-      .help(domain.state == .enable ? "点击暂停" : "点击启用")
+      .help(domain.state == .enable ? "Click to pause" : "Click to enable")
     }
     .padding(.vertical, 2)
     .accessibilityIdentifier("domain-row-\(domain.id.rawValue)")
@@ -132,16 +132,16 @@ struct AddDomainSheet: View {
 
   var body: some View {
     VStack(spacing: 16) {
-      Text("添加域名").font(.headline)
-      TextField("域名", text: $name, prompt: Text("example.com"))
+      Text("Add Domain").font(.headline)
+      TextField("Domain", text: $name, prompt: Text("example.com"))
         .textFieldStyle(.roundedBorder)
         .onSubmit(submit)
       if let errorMessage {
         Text(errorMessage).font(.callout).foregroundStyle(.red)
       }
       HStack {
-        Button("取消") { dismiss() }
-        Button("添加", action: submit)
+        Button("Cancel") { dismiss() }
+        Button("Add", action: submit)
           .buttonStyle(.borderedProminent)
           .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty || isWorking)
       }

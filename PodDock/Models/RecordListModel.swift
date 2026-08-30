@@ -7,10 +7,19 @@ import Observation
 @Observable
 final class RecordListModel {
   enum SortOrder: String, CaseIterable, Identifiable {
-    case byName = "按名称"
-    case byType = "按类型"
-    case byTTL = "按 TTL"
+    case byName
+    case byType
+    case byTTL
+
     var id: String { rawValue }
+
+    var displayName: String {
+      switch self {
+      case .byName: String(localized: "By Name")
+      case .byType: String(localized: "By Type")
+      case .byTTL: String(localized: "By TTL")
+      }
+    }
   }
 
   private weak var environment: AppEnvironment?
@@ -103,7 +112,7 @@ final class RecordListModel {
     do {
       try await client.setRecordRemark(id: record.id, domainID: domain.id, remark: remark)
       await load()
-      latestMessage = "备注已更新"
+      latestMessage = String(localized: "Remark updated")
     } catch {
       errorMessage = error.localizedDescription
     }
@@ -136,8 +145,10 @@ final class RecordListModel {
     await load()
     latestMessage =
       failures.isEmpty
-      ? "批量操作完成(\(records.count) 条)"
-      : "完成 \(records.count - failures.count)/\(records.count),失败:\(failures.joined(separator: ";"))"
+      ? String(localized: "Batch complete (\(records.count) items)")
+      : String(
+        format: String(localized: "Batch finished %1$lld/%2$lld, failed: %3$@"),
+        records.count - failures.count, records.count, failures.joined(separator: "; "))
   }
 
   enum BatchAction {

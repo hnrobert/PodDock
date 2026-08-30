@@ -30,12 +30,13 @@ final class AppLockController {
     let context = LAContext()
     do {
       let success = try await context.evaluatePolicy(
-        .deviceOwnerAuthentication, localizedReason: "解锁 PodDock 以管理你的解析")
+        .deviceOwnerAuthentication,
+        localizedReason: String(localized: "Unlock PodDock to manage your DNS"))
       if success {
         isLocked = false
         unlockFailureMessage = nil
       } else {
-        unlockFailureMessage = "验证未通过"
+        unlockFailureMessage = String(localized: "Verification failed")
       }
     } catch {
       unlockFailureMessage = error.localizedDescription

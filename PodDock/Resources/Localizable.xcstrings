@@ -1,29 +1,259 @@
 {
-  "sourceLanguage": "zh-Hans",
+  "sourceLanguage": "en",
   "strings": {
-    "添加 DNSPod 账户": {
+    "%lld records": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Add DNSPod Account"
+            "value": "%lld 条记录"
           }
         }
       }
     },
-    "使用 DNSPod API Token 连接你的账户。Token 只保存在本机 Keychain。": {
+    "@ or www": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Connect with a DNSPod API Token. It is stored only in this Mac's Keychain."
+            "value": "@ 或 www"
+          }
+        }
+      }
+    },
+    "About": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关于"
+          }
+        }
+      }
+    },
+    "Accounts": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "账户"
+          }
+        }
+      }
+    },
+    "Add": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加"
+          }
+        }
+      }
+    },
+    "Add Account…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加账户…"
+          }
+        }
+      }
+    },
+    "Add DNSPod Account": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加 DNSPod 账户"
+          }
+        }
+      }
+    },
+    "Add Domain": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加域名"
+          }
+        }
+      }
+    },
+    "Add Record": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加记录"
+          }
+        }
+      }
+    },
+    "All Types": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部类型"
+          }
+        }
+      }
+    },
+    "Banned": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "封禁"
+          }
+        }
+      }
+    },
+    "Batch complete (%lld items)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "批量操作完成(%lld 条)"
+          }
+        }
+      }
+    },
+    "Batch finished %1$lld/%2$lld, failed: %3$@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成 %1$lld/%2$lld,失败:%3$@"
+          }
+        }
+      }
+    },
+    "Batch running…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "批量执行中…"
+          }
+        }
+      }
+    },
+    "By Name": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按名称"
+          }
+        }
+      }
+    },
+    "By TTL": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按 TTL"
+          }
+        }
+      }
+    },
+    "By Type": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按类型"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        }
+      }
+    },
+    "Check via DoH": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoH 检测"
+          }
+        }
+      }
+    },
+    "Click to enable": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点击启用"
+          }
+        }
+      }
+    },
+    "Click to pause": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点击暂停"
+          }
+        }
+      }
+    },
+    "Coming in M3": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "M3 里程碑提供"
+          }
+        }
+      }
+    },
+    "Connect with a DNSPod API Token. It is stored only in this Mac's Keychain.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用 DNSPod API Token 连接你的账户。Token 只保存在本机 Keychain。"
+          }
+        }
+      }
+    },
+    "Console → Account → API Keys.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "控制台 → 账户 → API 密钥。"
+          }
+        }
+      }
+    },
+    "Credentials for %@ are no longer valid; please re-add the account.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "账户 %@ 的凭据已失效,请重新添加。"
           }
         }
       }
     },
     "DNSPod API Token": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "DNSPod API Token"
@@ -31,669 +261,279 @@
         }
       }
     },
-    "Token ID": {
+    "DNSPod Console": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Token ID"
+            "value": "DNSPod 控制台"
           }
         }
       }
     },
-    "例如 123456": {
+    "Default DoH Provider": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "e.g. 123456"
+            "value": "默认 DoH 服务商"
           }
         }
       }
     },
-    "Token Key": {
+    "Display name; defaults to last 4 digits of the ID": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Token Key"
+            "value": "显示名称,默认取 ID 后 4 位"
           }
         }
       }
     },
-    "密钥": {
+    "Domains": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "secret"
+            "value": "域名"
           }
         }
       }
     },
-    "标签(可选)": {
+    "Done": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Label (optional)"
+            "value": "完成"
           }
         }
       }
     },
-    "标签": {
+    "Edit Record %@": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Label"
+            "value": "修改记录 %@"
           }
         }
       }
     },
-    "显示名称,默认取 ID 后 4 位": {
+    "Edit…": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Display name; defaults to last 4 digits of the ID"
+            "value": "编辑…"
           }
         }
       }
     },
-    "打开 DNSPod 控制台创建 API Token": {
+    "Enable": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open the DNSPod console to create an API Token"
+            "value": "启用"
           }
         }
       }
     },
-    "控制台 → 账户 → API 密钥。": {
+    "Enable Selected (%lld)": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Console → Account → API Keys."
+            "value": "启用所选(%lld)"
           }
         }
       }
     },
-    "验证并添加": {
+    "Enabled": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Verify & Add"
+            "value": "已启用"
           }
         }
       }
     },
-    "PodDock 已锁定": {
+    "Error": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "PodDock Locked"
+            "value": "出错了"
           }
         }
       }
     },
-    "解锁": {
+    "Face ID / Touch ID App Lock": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Unlock"
+            "value": "Face ID / Touch ID 应用锁"
           }
         }
       }
     },
-    "选择域名": {
+    "Failed to load types/lines: %@ (you can type manually)": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Select a Domain"
+            "value": "类型/线路获取失败:%@(可直接手填)"
           }
         }
       }
     },
-    "在侧栏选择一个域名,查看与管理它的解析记录": {
+    "Falls back to the system resolver when DoH is unreachable; results are labeled by source.": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pick a domain in the sidebar to view and manage its records"
+            "value": "DoH 不可达时自动回退系统解析,结果会标注来源。"
           }
         }
       }
     },
-    "域名": {
+    "Full hostname, e.g. www.example.com": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Domains"
+            "value": "完整主机名,如 www.example.com"
           }
         }
       }
     },
-    "搜索域名": {
+    "Host": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Search domains"
+            "value": "主机记录"
           }
         }
       }
     },
-    "添加域名": {
+    "Hostname": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Add Domain"
+            "value": "主机名"
           }
         }
       }
     },
-    "刷新": {
+    "IPv4 address, e.g. 203.0.113.10": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Refresh"
+            "value": "IPv4 地址,如 203.0.113.10"
           }
         }
       }
     },
-    "暂停解析": {
+    "IPv6 address": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pause DNS"
+            "value": "IPv6 地址"
           }
         }
       }
     },
-    "启用解析": {
+    "Identity verification is required at cold start; credentials stay encrypted in the local Keychain and never sync.": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Resume DNS"
+            "value": "开启后冷启动需验证身份;凭据本身始终加密存于本机 Keychain(不随设备迁移)。"
           }
         }
       }
     },
-    "删除域名…": {
+    "Label": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Remove Domain…"
+            "value": "标签"
           }
         }
       }
     },
-    "删除域名": {
+    "Label (optional)": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Remove Domain"
+            "value": "标签(可选)"
           }
         }
       }
     },
-    "删除": {
+    "Legacy API": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Remove"
+            "value": "传统 API"
           }
         }
       }
     },
-    "取消": {
+    "Line": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cancel"
+            "value": "线路"
           }
         }
       }
     },
-    "确定删除域名 %@?该域名的解析将一并失效。": {
+    "Loading available types and lines…": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Remove %@? Its records will stop resolving."
+            "value": "正在获取可用类型与线路…"
           }
         }
       }
     },
-    "出错了": {
+    "Local MCP Service": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Error"
+            "value": "本地 MCP 服务"
           }
         }
       }
     },
-    "好": {
+    "Locked": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "OK"
-          }
-        }
-      }
-    },
-    "%lld 条记录": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld records"
-          }
-        }
-      }
-    },
-    "已启用": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enabled"
-          }
-        }
-      }
-    },
-    "已暂停": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paused"
-          }
-        }
-      }
-    },
-    "点击暂停": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Click to pause"
-          }
-        }
-      }
-    },
-    "点击启用": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Click to enable"
-          }
-        }
-      }
-    },
-    "添加": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Add"
-          }
-        }
-      }
-    },
-    "暂无解析记录": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No Records"
-          }
-        }
-      }
-    },
-    "点击工具栏 + 添加第一条记录": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Use + in the toolbar to add the first record"
-          }
-        }
-      }
-    },
-    "搜索主机/值/备注": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Search host / value / remark"
-          }
-        }
-      }
-    },
-    "添加记录": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Add Record"
-          }
-        }
-      }
-    },
-    "选择": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Select"
-          }
-        }
-      }
-    },
-    "启用所选(%lld)": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enable Selected (%lld)"
-          }
-        }
-      }
-    },
-    "暂停所选(%lld)": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pause Selected (%lld)"
-          }
-        }
-      }
-    },
-    "删除所选(%lld)…": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remove Selected (%lld)…"
-          }
-        }
-      }
-    },
-    "类型": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Type"
-          }
-        }
-      }
-    },
-    "全部类型": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "All Types"
-          }
-        }
-      }
-    },
-    "排序": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sort"
-          }
-        }
-      }
-    },
-    "按名称": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "By Name"
-          }
-        }
-      }
-    },
-    "按类型": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "By Type"
-          }
-        }
-      }
-    },
-    "按 TTL": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "By TTL"
-          }
-        }
-      }
-    },
-    "批量执行中…": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Batch running…"
-          }
-        }
-      }
-    },
-    "编辑…": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Edit…"
-          }
-        }
-      }
-    },
-    "备注…": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remark…"
-          }
-        }
-      }
-    },
-    "暂停": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paused"
-          }
-        }
-      }
-    },
-    "启用": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enabled"
-          }
-        }
-      }
-    },
-    "DoH 检测": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Check via DoH"
-          }
-        }
-      }
-    },
-    "删除…": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remove…"
-          }
-        }
-      }
-    },
-    "删除记录": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remove Record"
-          }
-        }
-      }
-    },
-    "删除 %@": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remove %@"
-          }
-        }
-      }
-    },
-    "删除后解析立即失效,不可恢复。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Records stop resolving immediately. This cannot be undone."
-          }
-        }
-      }
-    },
-    "批量删除 %lld 条记录": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remove %lld Records"
-          }
-        }
-      }
-    },
-    "全部删除": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remove All"
-          }
-        }
-      }
-    },
-    "将顺序删除所选记录,失败项会在完成后逐条列出。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Records will be removed one by one; failures are listed when done."
-          }
-        }
-      }
-    },
-    "提示": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Notice"
-          }
-        }
-      }
-    },
-    "备注 - %@": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remark - %@"
-          }
-        }
-      }
-    },
-    "备注内容(留空即清除)": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remark text (empty to clear)"
-          }
-        }
-      }
-    },
-    "保存": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Save"
-          }
-        }
-      }
-    },
-    "备注:%@": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remark: %@"
-          }
-        }
-      }
-    },
-    "TTL %lld": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "TTL %lld"
+            "value": "锁定"
           }
         }
       }
     },
     "MX %lld": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "MX %lld"
@@ -701,269 +541,579 @@
         }
       }
     },
-    "记录": {
+    "MX Priority": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Record"
+            "value": "MX 优先级"
           }
         }
       }
     },
-    "主机记录": {
+    "Mail server hostname": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Host"
+            "value": "邮件服务器主机名"
           }
         }
       }
     },
-    "@ 或 www": {
+    "No Records": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "@ or www"
+            "value": "暂无解析记录"
           }
         }
       }
     },
-    "记录类型": {
+    "No answers — the change may not be live yet, or the type differs.": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Record Type"
+            "value": "没有查询到记录——可能尚未生效或类型不符。"
           }
         }
       }
     },
-    "线路": {
+    "Notice": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Line"
+            "value": "提示"
           }
         }
       }
     },
-    "记录值": {
+    "OK": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Value"
+            "value": "好"
           }
         }
       }
     },
-    "IPv4 地址,如 203.0.113.10": {
+    "Only removes local credentials; your DNSPod account is untouched.": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "IPv4 address, e.g. 203.0.113.10"
+            "value": "仅从本机移除凭据,不影响 DNSPod 账号本身。"
           }
         }
       }
     },
-    "IPv6 地址": {
+    "Open the DNSPod console to create an API Token": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "IPv6 address"
+            "value": "打开 DNSPod 控制台创建 API Token"
           }
         }
       }
     },
-    "目标主机名": {
+    "Optional": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Target hostname"
+            "value": "可选"
           }
         }
       }
     },
-    "邮件服务器主机名": {
+    "Pause": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mail server hostname"
+            "value": "暂停"
           }
         }
       }
     },
-    "文本内容": {
+    "Pause DNS": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Text content"
+            "value": "暂停解析"
           }
         }
       }
     },
-    "MX 优先级": {
+    "Pause Selected (%lld)": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "MX Priority"
+            "value": "暂停所选(%lld)"
           }
         }
       }
     },
-    "TTL(秒)": {
+    "Paused": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "TTL (seconds)"
+            "value": "已暂停"
           }
         }
       }
     },
-    "备注": {
+    "Pick a domain in the sidebar to view and manage its records": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Remark"
+            "value": "在侧栏选择一个域名,查看与管理它的解析记录"
           }
         }
       }
     },
-    "可选": {
+    "PodDock Locked": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Optional"
+            "value": "PodDock 已锁定"
           }
         }
       }
     },
-    "正在获取可用类型与线路…": {
+    "Propagation": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Loading available types and lines…"
+            "value": "解析检测"
           }
         }
       }
     },
-    "修改记录 %@": {
+    "Propagation Check": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Edit Record %@"
+            "value": "解析生效检测"
           }
         }
       }
     },
-    "类型/线路获取失败:%@(可直接手填)": {
+    "Provider": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Failed to load types/lines: %@ (you can type manually)"
+            "value": "服务商"
           }
         }
       }
     },
-    "解析生效检测": {
+    "Query": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Propagation Check"
+            "value": "查询"
           }
         }
       }
     },
-    "主机名": {
+    "Record": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hostname"
+            "value": "记录"
           }
         }
       }
     },
-    "完整主机名,如 www.example.com": {
+    "Record Type": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Full hostname, e.g. www.example.com"
+            "value": "记录类型"
           }
         }
       }
     },
-    "服务商": {
+    "Records stop resolving immediately. This cannot be undone.": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Provider"
+            "value": "删除后解析立即失效,不可恢复。"
           }
         }
       }
     },
-    "查询": {
+    "Records will be removed one by one; failures are listed when done.": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Query"
+            "value": "将顺序删除所选记录,失败项会在完成后逐条列出。"
           }
         }
       }
     },
-    "完成": {
+    "Refresh": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Done"
+            "value": "刷新"
           }
         }
       }
     },
-    "没有查询到记录——可能尚未生效或类型不符。": {
+    "Remark": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "No answers — the change may not be live yet, or the type differs."
+            "value": "备注"
           }
         }
       }
     },
-    "账户": {
+    "Remark - %@": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Accounts"
+            "value": "备注 - %@"
+          }
+        }
+      }
+    },
+    "Remark text (empty to clear)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "备注内容(留空即清除)"
+          }
+        }
+      }
+    },
+    "Remark updated": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "备注已更新"
+          }
+        }
+      }
+    },
+    "Remark: %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "备注:%@"
+          }
+        }
+      }
+    },
+    "Remark…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "备注…"
+          }
+        }
+      }
+    },
+    "Remove": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除"
+          }
+        }
+      }
+    },
+    "Remove %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除 %@"
+          }
+        }
+      }
+    },
+    "Remove %@? Its records will stop resolving.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确定删除域名 %@?该域名的解析将一并失效。"
+          }
+        }
+      }
+    },
+    "Remove %lld Records": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "批量删除 %lld 条记录"
+          }
+        }
+      }
+    },
+    "Remove Account": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除账户"
+          }
+        }
+      }
+    },
+    "Remove All": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部删除"
+          }
+        }
+      }
+    },
+    "Remove Domain": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除域名"
+          }
+        }
+      }
+    },
+    "Remove Domain…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除域名…"
+          }
+        }
+      }
+    },
+    "Remove Record": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除记录"
+          }
+        }
+      }
+    },
+    "Remove Selected (%lld)…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除所选(%lld)…"
+          }
+        }
+      }
+    },
+    "Remove…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除…"
+          }
+        }
+      }
+    },
+    "Resume DNS": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "启用解析"
+          }
+        }
+      }
+    },
+    "Save": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存"
+          }
+        }
+      }
+    },
+    "Search domains": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索域名"
+          }
+        }
+      }
+    },
+    "Search host / value / remark": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索主机/值/备注"
+          }
+        }
+      }
+    },
+    "Security": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安全"
+          }
+        }
+      }
+    },
+    "Select": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择"
+          }
+        }
+      }
+    },
+    "Select a Domain": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择域名"
+          }
+        }
+      }
+    },
+    "Sort": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "排序"
+          }
+        }
+      }
+    },
+    "Source: %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来源:%@"
+          }
+        }
+      }
+    },
+    "Source: system resolver (DoH unreachable)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来源:系统解析(DoH 不可达时回退)"
+          }
+        }
+      }
+    },
+    "Switch": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "切换"
+          }
+        }
+      }
+    },
+    "TTL %lld": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TTL %lld"
+          }
+        }
+      }
+    },
+    "TTL (seconds)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TTL(秒)"
+          }
+        }
+      }
+    },
+    "Target hostname": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目标主机名"
+          }
+        }
+      }
+    },
+    "Text content": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文本内容"
+          }
+        }
+      }
+    },
+    "Token ID": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Token ID"
           }
         }
       }
     },
     "Token ID %@ · %@": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "Token ID %@ · %@"
@@ -971,192 +1121,122 @@
         }
       }
     },
-    "传统 API": {
+    "Token Key": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Legacy API"
+            "value": "Token Key"
           }
         }
       }
     },
-    "切换": {
+    "Type": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Switch"
+            "value": "类型"
           }
         }
       }
     },
-    "添加账户…": {
+    "Unknown": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Add Account…"
+            "value": "未知"
           }
         }
       }
     },
-    "安全": {
+    "Unlock": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Security"
+            "value": "解锁"
           }
         }
       }
     },
-    "Face ID / Touch ID 应用锁": {
+    "Unlock PodDock to manage your DNS": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Face ID / Touch ID App Lock"
+            "value": "解锁 PodDock 以管理你的解析"
           }
         }
       }
     },
-    "开启后冷启动需验证身份;凭据本身始终加密存于本机 Keychain(不随设备迁移)。": {
+    "Use + in the toolbar to add the first record": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Identity verification is required at cold start; credentials stay encrypted in the local Keychain and never sync."
+            "value": "点击工具栏 + 添加第一条记录"
           }
         }
       }
     },
-    "解析检测": {
+    "Value": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Propagation"
+            "value": "记录值"
           }
         }
       }
     },
-    "默认 DoH 服务商": {
+    "Verification failed": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Default DoH Provider"
+            "value": "验证未通过"
           }
         }
       }
     },
-    "DoH 不可达时自动回退系统解析,结果会标注来源。": {
+    "Verify & Add": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Falls back to the system resolver when DoH is unreachable; results are labeled by source."
+            "value": "验证并添加"
           }
         }
       }
     },
-    "关于": {
+    "Version": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "About"
+            "value": "版本"
           }
         }
       }
     },
-    "版本": {
+    "e.g. 123456": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Version"
+            "value": "例如 123456"
           }
         }
       }
     },
-    "本地 MCP 服务": {
+    "secret": {
       "localizations": {
-        "en": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Local MCP Service"
-          }
-        }
-      }
-    },
-    "M3 里程碑提供": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Coming in M3"
-          }
-        }
-      }
-    },
-    "DNSPod 控制台": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "DNSPod Console"
-          }
-        }
-      }
-    },
-    "删除账户": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remove Account"
-          }
-        }
-      }
-    },
-    "仅从本机移除凭据,不影响 DNSPod 账号本身。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Only removes local credentials; your DNSPod account is untouched."
-          }
-        }
-      }
-    },
-    "封禁": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Banned"
-          }
-        }
-      }
-    },
-    "锁定": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Locked"
-          }
-        }
-      }
-    },
-    "未知": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unknown"
+            "value": "密钥"
           }
         }
       }

@@ -45,52 +45,52 @@ struct RecordFormView: View {
   var body: some View {
     VStack(spacing: 0) {
       Form {
-        Section("记录") {
-          LabeledContent("主机记录") {
-            TextField("主机记录", text: $subDomain, prompt: Text("@ 或 www"))
+        Section("Record") {
+          LabeledContent("Host") {
+            TextField("", text: $subDomain, prompt: Text("@ or www"))
           }
-          LabeledContent("记录类型") {
+          LabeledContent("Record Type") {
             if let options, !options.types.isEmpty {
               Picker("", selection: $recordType) {
                 ForEach(options.types, id: \.self) { Text($0).tag($0) }
               }
               .labelsHidden()
             } else {
-              TextField("A", text: $recordType)
+              TextField("", text: $recordType)
             }
           }
-          LabeledContent("线路") {
+          LabeledContent("Line") {
             if let options, !options.lines.isEmpty {
               Picker("", selection: $recordLine) {
                 ForEach(options.lines, id: \.self) { Text($0).tag($0) }
               }
               .labelsHidden()
             } else {
-              TextField("默认", text: $recordLine)
+              TextField("", text: $recordLine)
             }
           }
-          LabeledContent("记录值") {
-            TextField("记录值", text: $value, prompt: Text(valueHint))
+          LabeledContent("Value") {
+            TextField("", text: $value, prompt: Text(valueHint))
           }
           if recordType == "MX" {
-            LabeledContent("MX 优先级") {
-              TextField("MX 优先级", text: $mxText, prompt: Text("10"))
+            LabeledContent("MX Priority") {
+              TextField("", text: $mxText, prompt: Text("10"))
             }
           }
-          LabeledContent("TTL(秒)") {
-            TextField("TTL", text: $ttlText, prompt: Text("600"))
+          LabeledContent("TTL (seconds)") {
+            TextField("", text: $ttlText, prompt: Text("600"))
           }
         }
 
-        Section("备注") {
-          TextField("备注", text: $remark, prompt: Text("可选"))
+        Section("Remark") {
+          TextField("", text: $remark, prompt: Text("Optional"))
         }
 
         if isLoadingOptions {
           Section {
             HStack {
               ProgressView().controlSize(.small)
-              Text("正在获取可用类型与线路…")
+              Text("Loading available types and lines…")
             }
             .foregroundStyle(.secondary)
           }
@@ -102,14 +102,14 @@ struct RecordFormView: View {
       .formStyle(.grouped)
 
       HStack {
-        Text(isCreate ? "添加记录" : "修改记录 \(original?.name ?? "")")
+        Text(isCreate ? "Add Record" : "Edit Record \(original?.name ?? "")")
           .font(.headline)
         Spacer()
         if isSaving {
           ProgressView().controlSize(.small)
         }
-        Button("取消") { dismiss() }
-        Button("保存", action: save)
+        Button("Cancel") { dismiss() }
+        Button("Save", action: save)
           .buttonStyle(.borderedProminent)
           .disabled(!isValid || isSaving)
       }
@@ -124,12 +124,12 @@ struct RecordFormView: View {
 
   private var valueHint: String {
     switch recordType {
-    case "A": "IPv4 地址,如 203.0.113.10"
-    case "AAAA": "IPv6 地址"
-    case "CNAME": "目标主机名"
-    case "MX": "邮件服务器主机名"
-    case "TXT": "文本内容"
-    default: "记录值"
+    case "A": "IPv4 address, e.g. 203.0.113.10"
+    case "AAAA": "IPv6 address"
+    case "CNAME": "Target hostname"
+    case "MX": "Mail server hostname"
+    case "TXT": "Text content"
+    default: "Value"
     }
   }
 
@@ -167,7 +167,8 @@ struct RecordFormView: View {
         recordLine = options.lines.first ?? recordLine
       }
     } catch {
-      errorMessage = "类型/线路获取失败:\(error.localizedDescription)(可直接手填)"
+      errorMessage = String(
+        localized: "Failed to load types/lines: \(error.localizedDescription) (you can type manually)")
     }
   }
 

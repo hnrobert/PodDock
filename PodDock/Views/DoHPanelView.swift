@@ -15,18 +15,18 @@ struct DoHPanelView: View {
 
   var body: some View {
     VStack(spacing: 16) {
-      Text("解析生效检测").font(.headline)
+      Text("Propagation Check").font(.headline)
 
       Form {
-        TextField("主机名", text: $initialName, prompt: Text("完整主机名,如 www.example.com"))
+        TextField("Hostname", text: $initialName, prompt: Text("Full hostname, e.g. www.example.com"))
           .textFieldStyle(.roundedBorder)
           .onSubmit(run)
         HStack {
-          Picker("记录类型", selection: $recordType) {
+          Picker("Record Type", selection: $recordType) {
             ForEach(["A", "AAAA", "CNAME", "MX", "TXT"], id: \.self) { Text($0) }
           }
           .frame(maxWidth: 120)
-          Picker("服务商", selection: $provider) {
+          Picker("Provider", selection: $provider) {
             ForEach(DoHProvider.allCases) { provider in
               Text(provider.displayName).tag(provider)
             }
@@ -43,12 +43,12 @@ struct DoHPanelView: View {
           if isRunning {
             ProgressView().controlSize(.small)
           } else {
-            Text("查询")
+            Text("Query")
           }
         }
         .buttonStyle(.borderedProminent)
         .disabled(initialName.isEmpty || isRunning)
-        Button("完成") { dismiss() }
+        Button("Done") { dismiss() }
       }
 
       if let errorMessage {
@@ -64,7 +64,7 @@ struct DoHPanelView: View {
             Spacer()
           }
           if result.answers.isEmpty {
-            Text("没有查询到记录——可能尚未生效或类型不符。")
+            Text("No answers — the change may not be live yet, or the type differs.")
               .foregroundStyle(.secondary)
           }
           ForEach(Array(result.answers.enumerated()), id: \.offset) { _, answer in
@@ -106,8 +106,10 @@ struct DoHPanelView: View {
 
   private func sourceLabel(_ source: DoHSource) -> String {
     switch source {
-    case .doh(let provider): "来源:\(provider.displayName)"
-    case .system: "来源:系统解析(DoH 不可达时回退)"
+    case .doh(let provider):
+      String(localized: "Source: \(provider.displayName)")
+    case .system:
+      String(localized: "Source: system resolver (DoH unreachable)")
     }
   }
 

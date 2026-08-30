@@ -16,11 +16,11 @@ struct StatusBadge: View {
 
   private var label: String {
     switch state {
-    case .enable: "启用"
-    case .pause: "暂停"
-    case .spam: "封禁"
-    case .lock: "锁定"
-    case .unknown: "未知"
+    case .enable: "Enabled"
+    case .pause: "Paused"
+    case .spam: "Banned"
+    case .lock: "Locked"
+    case .unknown: "Unknown"
     }
   }
 
@@ -43,6 +43,6 @@ struct RecordStateDot: View {
     Circle()
       .fill(isEnabled ? Color.green : Color.gray.opacity(0.5))
       .frame(width: 8, height: 8)
-      .help(isEnabled ? "已启用" : "已暂停")
+      .help(isEnabled ? "Enabled" : "Paused")
   }
 }

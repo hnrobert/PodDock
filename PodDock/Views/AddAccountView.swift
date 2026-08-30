@@ -1,7 +1,7 @@
 import SwiftUI
 import DNSPodKit
 
-/// 添加账户:粘贴 "ID,Token" 自动拆分 + 控制台引导链接;凭据验证通过才落 Keychain。
+/// 添加账户:凭据验证通过才落 Keychain。
 struct AddAccountView: View {
   @Environment(AppEnvironment.self) private var environment
 
@@ -19,8 +19,8 @@ struct AddAccountView: View {
         .font(.system(size: 56))
         .foregroundStyle(.green)
 
-      Text("添加 DNSPod 账户").font(.title2.bold())
-      Text("使用 DNSPod API Token 连接你的账户。Token 只保存在本机 Keychain。")
+      Text("Add DNSPod Account").font(.title2.bold())
+      Text("Connect with a DNSPod API Token. It is stored only in this Mac's Keychain.")
         .font(.callout)
         .foregroundStyle(.secondary)
         .multilineTextAlignment(.center)
@@ -28,19 +28,19 @@ struct AddAccountView: View {
       Form {
         Section("DNSPod API Token") {
           LabeledContent("Token ID") {
-            TextField("Token ID", text: $tokenID, prompt: Text("例如 123456"))
+            TextField("", text: $tokenID, prompt: Text("e.g. 123456"))
           }
           LabeledContent("Token Key") {
-            SecureField("Token Key", text: $tokenKey, prompt: Text("密钥"))
+            SecureField("", text: $tokenKey, prompt: Text("secret"))
           }
-          LabeledContent("标签(可选)") {
-            TextField("标签", text: $label, prompt: Text("显示名称,默认取 ID 后 4 位"))
+          LabeledContent("Label (optional)") {
+            TextField("", text: $label, prompt: Text("Display name; defaults to last 4 digits of the ID"))
           }
         }
 
         Section {
-          Link("打开 DNSPod 控制台创建 API Token", destination: consoleURL)
-          Text("控制台 → 账户 → API 密钥。")
+          Link("Open the DNSPod console to create an API Token", destination: consoleURL)
+          Text("Console → Account → API Keys.")
             .font(.caption)
             .foregroundStyle(.secondary)
         }
@@ -58,7 +58,7 @@ struct AddAccountView: View {
         if isWorking {
           ProgressView().controlSize(.small)
         } else {
-          Text("验证并添加").frame(minWidth: 120)
+          Text("Verify & Add").frame(minWidth: 120)
         }
       }
       .buttonStyle(.borderedProminent)

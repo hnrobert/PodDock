@@ -12,7 +12,7 @@ PodDock 是 DNSPod 的原生 SwiftUI 客户端,2026-08-30 立项,从 dnspod-api-
 | --- | --- |
 | 平台 | macOS 15 / iOS 18 起;单 App target `supportedDestinations = [.macOS, .iOS]`,macOS 先行 |
 | 分发 | 自用优先,按可上架标准预留(bundle id、权限、隐私清单) |
-| 界面语言 | 中英双语,首版即用 String Catalog(`developmentRegion = zh-Hans`,中文为源语言) |
+| 界面语言 | 中英双语,首版即用 String Catalog(**英文为源语言与代码字面量(键),zh-Hans 为翻译**;动态消息走 `String(localized:)`;DNSPod 线路名等线格式数据值不本地化) |
 | API | 双实现适配层:`DNSPodClient` 协议(意图级)+ LegacyClient(传统 API);TencentCloudClient(TC3)占位,M5 升级最小实现 |
 | 账户 | 多账户可切换;Face ID / Touch ID 应用锁可选开关 |
 | 登录辅助 | 粘贴 `ID,Token` 自动拆分 + 控制台引导链接 |

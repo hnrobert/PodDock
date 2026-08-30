@@ -119,7 +119,8 @@ final class AppEnvironment {
   /// 认证失败时踢回:移除失效凭据并提示重新添加
   func handleAuthenticationFailure() async {
     guard let current = currentAccount else { return }
-    latestMessage = "账户 \(current.label) 的凭据已失效,请重新添加。"
+    latestMessage = String(
+      localized: "Credentials for \(current.label) are no longer valid; please re-add the account.")
     await removeAccount(current.id)
   }
 }

@@ -31,9 +31,9 @@ struct MainSplitView: View {
         RecordListView(domain: domain)
       } else {
         ContentUnavailableView(
-          "选择域名",
+          "Select a Domain",
           systemImage: "globe.desk",
-          description: Text("在侧栏选择一个域名,查看与管理它的解析记录")
+          description: Text("Pick a domain in the sidebar to view and manage its records")
         )
       }
     }

@@ -86,11 +86,11 @@
 				666666666666666666666666 /* XCLocalSwiftPackageReference "DNSPodKit" */,
 			);
 			compatibilityVersion = "Xcode 15.0";
-			developmentRegion = "zh-Hans";
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				"zh-Hans",
 				en,
+				"zh-Hans",
 				Base,
 			);
 			mainGroup = 444444444444444444444444;

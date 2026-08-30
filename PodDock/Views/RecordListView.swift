@@ -64,16 +64,16 @@ struct RecordListView: View {
         ProgressView()
       } else if model.records.isEmpty {
         ContentUnavailableView(
-          "暂无解析记录",
+          "No Records",
           systemImage: "list.bullet.rectangle",
-          description: Text("点击工具栏 + 添加第一条记录")
+          description: Text("Use + in the toolbar to add the first record")
         )
       }
     }
     .navigationTitle(domain.name)
     .searchable(
       text: Binding(get: { model.searchText }, set: { model.searchText = $0 }),
-      prompt: "搜索主机/值/备注"
+      prompt: "Search host / value / remark"
     )
     .toolbar { recordToolbar }
     .safeAreaInset(edge: .top) {
@@ -87,22 +87,22 @@ struct RecordListView: View {
     }
     .tag(record.id)
     .contextMenu {
-      Button("编辑…") { editingRecord = record }
-      Button("备注…") {
+      Button("Edit…") { editingRecord = record }
+      Button("Remark…") {
         remarkRecord = record
         remarkDraft = record.remark
       }
-      Button(record.isEnabled ? "暂停" : "启用") {
+      Button(record.isEnabled ? "Pause" : "Enable") {
         Task { await model.toggle(record) }
       }
       Divider()
-      Button("DoH 检测") {
+      Button("Check via DoH") {
         doHName = record.name == "@"
           ? model.domain?.name ?? domain.name
           : "\(record.name).\(domain.name)"
         isShowingDoH = true
       }
-      Button("删除…", role: .destructive) { pendingDelete = record }
+      Button("Remove…", role: .destructive) { pendingDelete = record }
     }
   }
 
@@ -112,33 +112,33 @@ struct RecordListView: View {
       Button {
         isShowingCreate = true
       } label: {
-        Label("添加记录", systemImage: "plus")
+        Label("Add Record", systemImage: "plus")
       }
     }
     ToolbarItem(placement: .automatic) {
       Button {
         Task { await model.load() }
       } label: {
-        Label("刷新", systemImage: "arrow.clockwise")
+        Label("Refresh", systemImage: "arrow.clockwise")
       }
     }
     ToolbarItem(placement: .automatic) {
       Toggle(isOn: $isSelecting) {
-        Label("选择", systemImage: "checkmark.circle")
+        Label("Select", systemImage: "checkmark.circle")
       }
       .toggleStyle(.button)
     }
     if isSelecting && !selection.isEmpty {
       ToolbarItemGroup(placement: .automatic) {
-        Button("启用所选(\(selection.count))") {
+        Button("Enable Selected (\(selection.count))") {
           let targets = model.records.filter { selection.contains($0.id) }
           Task { await model.batch(targets, action: .enable); selection.removeAll() }
         }
-        Button("暂停所选(\(selection.count))") {
+        Button("Pause Selected (\(selection.count))") {
           let targets = model.records.filter { selection.contains($0.id) }
           Task { await model.batch(targets, action: .disable); selection.removeAll() }
         }
-        Button("删除所选(\(selection.count))…", role: .destructive) {
+        Button("Remove Selected (\(selection.count))…", role: .destructive) {
           pendingBatchDelete = model.records.filter { selection.contains($0.id) }
         }
       }
@@ -148,23 +148,23 @@ struct RecordListView: View {
   /// 类型筛选 + 排序条
   private var filterBar: some View {
     HStack(spacing: 12) {
-      Picker("类型", selection: Binding(
+      Picker("Type", selection: Binding(
         get: { model.typeFilter },
         set: { model.typeFilter = $0 }
       )) {
-        Text("全部类型").tag(String?.none)
+        Text("All Types").tag(String?.none)
         ForEach(model.availableTypes, id: \.self) { type in
           Text(type).tag(String?.some(type))
         }
       }
       .frame(maxWidth: 160)
 
-      Picker("排序", selection: Binding(
+      Picker("Sort", selection: Binding(
         get: { model.sortOrder },
         set: { model.sortOrder = $0 }
       )) {
         ForEach(RecordListModel.SortOrder.allCases) { order in
-          Text(order.rawValue).tag(order)
+          Text(order.displayName).tag(order)
         }
       }
       .frame(maxWidth: 140)
@@ -172,7 +172,7 @@ struct RecordListView: View {
       Spacer()
       if model.isBatchRunning {
         ProgressView().controlSize(.small)
-        Text("批量执行中…").font(.caption).foregroundStyle(.secondary)
+        Text("Batch running…").font(.caption).foregroundStyle(.secondary)
       }
     }
     .padding(.horizontal, 12)
@@ -182,12 +182,12 @@ struct RecordListView: View {
 
   private func remarkSheet(_ record: DNSRecord) -> some View {
     VStack(spacing: 14) {
-      Text("备注 - \(record.name)").font(.headline)
-      TextField("备注内容(留空即清除)", text: $remarkDraft)
+      Text("Remark - \(record.name)").font(.headline)
+      TextField("Remark", text: $remarkDraft, prompt: Text("Remark text (empty to clear)"))
         .textFieldStyle(.roundedBorder)
       HStack {
-        Button("取消") { remarkRecord = nil }
-        Button("保存") {
+        Button("Cancel") { remarkRecord = nil }
+        Button("Save") {
           let target = record
           let text = remarkDraft
           remarkRecord = nil
@@ -220,7 +220,7 @@ private struct RecordRowView: View {
         }
         Text(record.value).font(.callout).foregroundStyle(.secondary).textSelection(.enabled)
         if !record.remark.isEmpty {
-          Text("备注:\(record.remark)").font(.caption).foregroundStyle(.tertiary)
+          Text("Remark: \(record.remark)").font(.caption).foregroundStyle(.tertiary)
         }
       }
       Spacer()
@@ -237,7 +237,7 @@ private struct RecordRowView: View {
       .toggleStyle(.switch)
       .labelsHidden()
       .disabled(record.type == "NS")
-      .help(record.isEnabled ? "点击暂停" : "点击启用")
+      .help(record.isEnabled ? "Click to pause" : "Click to enable")
     }
     .padding(.vertical, 2)
     .accessibilityIdentifier("record-row-\(record.id.rawValue)")
@@ -254,38 +254,38 @@ private struct RecordDialogsLayer: ViewModifier {
   func body(content: Content) -> some View {
     content
       .confirmationDialog(
-        "删除记录",
+        "Remove Record",
         isPresented: Binding(
           get: { pendingDelete != nil },
           set: { if !$0 { pendingDelete = nil } }
         ),
         titleVisibility: .visible
       ) {
-        Button("删除 \(pendingDelete?.name ?? "")", role: .destructive) {
+        Button("Remove \(pendingDelete?.name ?? "")", role: .destructive) {
           if let record = pendingDelete {
             remove(record)
           }
           pendingDelete = nil
         }
       } message: {
-        Text("删除后解析立即失效,不可恢复。")
+        Text("Records stop resolving immediately. This cannot be undone.")
       }
       .confirmationDialog(
-        "批量删除 \(pendingBatchDelete?.count ?? 0) 条记录",
+        "Remove \(pendingBatchDelete?.count ?? 0) Records",
         isPresented: Binding(
           get: { pendingBatchDelete != nil },
           set: { if !$0 { pendingBatchDelete = nil } }
         ),
         titleVisibility: .visible
       ) {
-        Button("全部删除", role: .destructive) {
+        Button("Remove All", role: .destructive) {
           if let records = pendingBatchDelete {
             batchRemove(records)
           }
           pendingBatchDelete = nil
         }
       } message: {
-        Text("将顺序删除所选记录,失败项会在完成后逐条列出。")
+        Text("Records will be removed one by one; failures are listed when done.")
       }
   }
 }
@@ -298,24 +298,24 @@ private struct RecordAlertsLayer: ViewModifier {
   func body(content: Content) -> some View {
     content
       .alert(
-        "提示",
+        "Notice",
         isPresented: Binding(
           get: { model.latestMessage != nil },
           set: { if !$0 { model.latestMessage = nil } }
         )
       ) {
-        Button("好", role: .cancel) { model.latestMessage = nil }
+        Button("OK", role: .cancel) { model.latestMessage = nil }
       } message: {
         Text(model.latestMessage ?? "")
       }
       .alert(
-        "出错了",
+        "Error",
         isPresented: Binding(
           get: { model.errorMessage != nil },
           set: { if !$0 { model.errorMessage = nil } }
         )
       ) {
-        Button("好", role: .cancel) { model.errorMessage = nil }
+        Button("OK", role: .cancel) { model.errorMessage = nil }
       } message: {
         Text(model.errorMessage ?? "")
       }

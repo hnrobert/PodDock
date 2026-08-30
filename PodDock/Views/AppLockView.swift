@@ -10,7 +10,7 @@ struct AppLockView: View {
       Image(systemName: "lock.fill")
         .font(.system(size: 56))
         .foregroundStyle(.secondary)
-      Text("PodDock 已锁定").font(.title3.bold())
+      Text("PodDock Locked").font(.title3.bold())
       if let failure = environment.lock.unlockFailureMessage {
         Text(failure).font(.callout).foregroundStyle(.red)
       }
@@ -25,7 +25,7 @@ struct AppLockView: View {
         if isAuthenticating {
           ProgressView().controlSize(.small)
         } else {
-          Label("解锁", systemImage: "faceid")
+          Label("Unlock", systemImage: "faceid")
         }
       }
       .buttonStyle(.borderedProminent)
