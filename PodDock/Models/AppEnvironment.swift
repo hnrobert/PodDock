@@ -33,6 +33,7 @@ final class AppEnvironment {
 
     #if DEBUG
       if isMock {
+        FileHandle.standardError.write(Data("[PodDock] mock mode ON\n".utf8))
         let store = InMemoryAccountStore()
         let seed = Account(loginTokenID: "123456", loginToken: "mock-token")
         self.accountStore = store
@@ -52,9 +53,12 @@ final class AppEnvironment {
 
   /// 启动装配:读账户 → 恢复当前账户 → 拉域名
   func bootstrap() async {
-    if !isMockMode {
-      accounts = (try? await accountStore.accounts()) ?? []
+    if isMockMode {
+      // mock 模式:client 已在 init 注入(activate 会用真实实现覆盖它)
+      await domains.load()
+      return
     }
+    accounts = (try? await accountStore.accounts()) ?? []
     let target =
       accounts.first { $0.id == preferences.currentAccountID } ?? accounts.first
     if let target {

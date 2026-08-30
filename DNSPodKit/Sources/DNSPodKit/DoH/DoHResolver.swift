@@ -66,6 +66,18 @@ public struct DoHResolver: Sendable {
   }
 
   public func resolve(name: String, recordType: String = "A") async throws -> DoHResult {
+    // SE-0461:非隔离 async 继承调用方 actor;DoH 往返与解码必须离开主线程
+    let provider = self.provider
+    let transport = self.transport
+    return try await Task.detached(priority: .userInitiated) {
+      try await Self.resolveOnCooperativePool(
+        name: name, recordType: recordType, provider: provider, transport: transport)
+    }.value
+  }
+
+  private static func resolveOnCooperativePool(
+    name: String, recordType: String, provider: DoHProvider, transport: HTTPTransport
+  ) async throws -> DoHResult {
     let wireType = Self.wireType(for: recordType)
     var components = URLComponents(url: provider.endpoint, resolvingAgainstBaseURL: false)!
     components.queryItems = [
@@ -135,7 +147,10 @@ public struct DoHResolver: Sendable {
     } catch {
       #if canImport(Darwin)
         if recordType.uppercased() == "A" {
-          let addresses = SystemIPv4Resolver.resolve(name: name)
+          // getaddrinfo 是阻塞调用,同样必须离开主线程
+          let addresses = await Task.detached(priority: .userInitiated) {
+            SystemIPv4Resolver.resolve(name: name)
+          }.value
           if !addresses.isEmpty {
             return DoHResult(
               name: name,

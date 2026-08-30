@@ -203,7 +203,10 @@ public struct LegacyClient: DNSPodClient {
       baseURL: baseURL, userAgent: userAgent, lang: lang)
   }
 
-  /// 发起一次传统 API 调用并完成信封校验(静态方法便于 optionsProvider 闭包复用)
+  /// 发起一次传统 API 调用并完成信封校验(静态方法便于 optionsProvider 闭包复用)。
+  ///
+  /// 整体跑在并发池(Task.detached):SE-0461 下非隔离 async 函数会继承调用方的
+  /// actor——从 UI 调用时网络往返与 JSON 解码会被串行到主线程,慢网络即卡死。
   static func raw(
     action: String,
     params: [String: String],
@@ -213,6 +216,24 @@ public struct LegacyClient: DNSPodClient {
     baseURL: URL,
     userAgent: String,
     lang: String = "cn"
+  ) async throws -> Data {
+    try await Task.detached(priority: .userInitiated) {
+      try await rawOnCooperativePool(
+        action: action, params: params,
+        transport: transport, tokenID: tokenID, tokenKey: tokenKey,
+        baseURL: baseURL, userAgent: userAgent, lang: lang)
+    }.value
+  }
+
+  private static func rawOnCooperativePool(
+    action: String,
+    params: [String: String],
+    transport: HTTPTransport,
+    tokenID: String,
+    tokenKey: String,
+    baseURL: URL,
+    userAgent: String,
+    lang: String
   ) async throws -> Data {
     var fields = params
     fields["login_token"] = "\(tokenID),\(tokenKey)"

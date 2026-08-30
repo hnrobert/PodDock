@@ -24,6 +24,9 @@ struct RecordListView: View {
       .task(id: domain.id) {
         model.attach(environment: environment, domain: domain)
         await model.load()
+        #if DEBUG
+          FileHandle.standardError.write(Data("[PodDock] RecordListView loaded \(model.records.count) records for \(domain.name)\n".utf8))
+        #endif
       }
       .sheet(isPresented: $isShowingCreate) {
         RecordFormView(mode: .create(domain: domain)) {

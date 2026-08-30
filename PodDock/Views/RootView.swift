@@ -37,6 +37,23 @@ struct MainSplitView: View {
         )
       }
     }
+    #if DEBUG
+      .task {
+        // 调试钩子:--autoselect 自动选中第一个域名(复现"选中即卡死"类问题);
+        // 等待 bootstrap 拉完域名列表,避免竞态取到空
+        guard ProcessInfo.processInfo.arguments.contains("--autoselect") else { return }
+        for _ in 0..<50 {
+          if selectedDomainID != nil { return }
+          if let first = environment.domains.domains.first {
+            FileHandle.standardError.write(Data("[PodDock] autoselect → \(first.name)\n".utf8))
+            selectedDomainID = first.id
+            return
+          }
+          try? await Task.sleep(for: .milliseconds(100))
+        }
+        FileHandle.standardError.write(Data("[PodDock] autoselect timed out waiting for domains\n".utf8))
+      }
+    #endif
   }
 }
 
