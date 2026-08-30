@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:PodDock}/DNSPodKit",
+            "name": "Debug poddock-mcp (DNSPodKit)",
+            "target": "poddock-mcp",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug poddock-mcp (DNSPodKit)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:PodDock}/DNSPodKit",
+            "name": "Release poddock-mcp (DNSPodKit)",
+            "target": "poddock-mcp",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release poddock-mcp (DNSPodKit)"
+        }
+    ]
+}
