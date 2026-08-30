@@ -321,6 +321,16 @@
         }
       }
     },
+    "Done Selecting": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成选择"
+          }
+        }
+      }
+    },
     "Edit Record %@": {
       "localizations": {
         "zh-Hans": {

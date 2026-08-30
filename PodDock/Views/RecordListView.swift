@@ -111,6 +111,8 @@ struct RecordListView: View {
 
   @ToolbarContentBuilder
   private var recordToolbar: some ToolbarContent {
+    // 工具栏必须完全静态:macOS 上动态增删 ToolbarItem / 工具栏内 Toggle
+    // 会在 NSToolbar 插入项时抛异常崩溃(crash 报告:_insertNewItemWithItemIdentifier)
     ToolbarItem(placement: .primaryAction) {
       Button {
         isShowingCreate = true
@@ -126,29 +128,19 @@ struct RecordListView: View {
       }
     }
     ToolbarItem(placement: .automatic) {
-      Toggle(isOn: $isSelecting) {
-        Label("Select", systemImage: "checkmark.circle")
-      }
-      .toggleStyle(.button)
-    }
-    if isSelecting && !selection.isEmpty {
-      ToolbarItemGroup(placement: .automatic) {
-        Button("Enable Selected (\(selection.count))") {
-          let targets = model.records.filter { selection.contains($0.id) }
-          Task { await model.batch(targets, action: .enable); selection.removeAll() }
-        }
-        Button("Pause Selected (\(selection.count))") {
-          let targets = model.records.filter { selection.contains($0.id) }
-          Task { await model.batch(targets, action: .disable); selection.removeAll() }
-        }
-        Button("Remove Selected (\(selection.count))…", role: .destructive) {
-          pendingBatchDelete = model.records.filter { selection.contains($0.id) }
-        }
+      Button {
+        isSelecting.toggle()
+        if !isSelecting { selection.removeAll() }
+      } label: {
+        Label(
+          isSelecting ? "Done Selecting" : "Select",
+          systemImage: isSelecting ? "checkmark.circle.fill" : "checkmark.circle"
+        )
       }
     }
   }
 
-  /// 类型筛选 + 排序条
+  /// 类型筛选 + 排序条(批量操作按钮也放这里,避免动态工具栏项)
   private var filterBar: some View {
     HStack(spacing: 12) {
       Picker("Type", selection: Binding(
@@ -176,6 +168,21 @@ struct RecordListView: View {
       if model.isBatchRunning {
         ProgressView().controlSize(.small)
         Text("Batch running…").font(.caption).foregroundStyle(.secondary)
+      } else if isSelecting {
+        Button("Enable Selected (\(selection.count))") {
+          let targets = model.records.filter { selection.contains($0.id) }
+          Task { await model.batch(targets, action: .enable); selection.removeAll() }
+        }
+        .disabled(selection.isEmpty)
+        Button("Pause Selected (\(selection.count))") {
+          let targets = model.records.filter { selection.contains($0.id) }
+          Task { await model.batch(targets, action: .disable); selection.removeAll() }
+        }
+        .disabled(selection.isEmpty)
+        Button("Remove Selected (\(selection.count))…", role: .destructive) {
+          pendingBatchDelete = model.records.filter { selection.contains($0.id) }
+        }
+        .disabled(selection.isEmpty)
       }
     }
     .padding(.horizontal, 12)

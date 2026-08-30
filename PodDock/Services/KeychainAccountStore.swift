@@ -41,19 +41,26 @@ final class KeychainAccountStore: AccountStoring, @unchecked Sendable {
     return query
   }
 
-  /// 带 -34018 降级重试的 SecItem 执行器
+  /// 在指定钥匙串模式执行;-34018(entitlement 缺失)时标记全局降级偏好
+  private func performIn(_ dataProtection: Bool, _ operation: (Bool) -> OSStatus) -> OSStatus {
+    let status = operation(dataProtection)
+    if status == errSecMissingEntitlement && dataProtection {
+      lock.lock()
+      useDataProtection = false
+      lock.unlock()
+    }
+    return status
+  }
+
+  /// 写路径:按当前偏好模式执行,-34018 自动降级重试
   private func perform(_ operation: (Bool) -> OSStatus) throws {
     lock.lock()
     let preferDataProtection = useDataProtection
     lock.unlock()
 
-    var status = operation(preferDataProtection)
+    var status = performIn(preferDataProtection, operation)
     if status == errSecMissingEntitlement, preferDataProtection {
-      // 无 entitlement 上下文(调试器直启/临时签名):降级文件钥匙串并记住
-      lock.lock()
-      useDataProtection = false
-      lock.unlock()
-      status = operation(false)
+      status = performIn(false, operation)
     }
     guard status == errSecSuccess || status == errSecItemNotFound else {
       throw KeychainError(status: status)
@@ -85,43 +92,51 @@ final class KeychainAccountStore: AccountStoring, @unchecked Sendable {
   }
 
   private func accountSync(id: UUID) -> Account? {
-    var result: Account?
-    try? perform { dataProtection in
-      var query = baseQuery(id: id, dataProtection: dataProtection)
-      query[kSecReturnAttributes as String] = true
-      query[kSecReturnData as String] = true
-      query[kSecMatchLimit as String] = kSecMatchLimitOne
+    // 双模式读取:账户可能存在任一钥匙串(例如调试会话存进了文件钥匙串)
+    for dataProtection in [true, false] {
+      var result: Account?
+      _ = performIn(dataProtection) { dp in
+        var query = baseQuery(id: id, dataProtection: dp)
+        query[kSecReturnAttributes as String] = true
+        query[kSecReturnData as String] = true
+        query[kSecMatchLimit as String] = kSecMatchLimitOne
 
-      var item: CFTypeRef?
-      let status = SecItemCopyMatching(query as CFDictionary, &item)
-      guard status == errSecSuccess, let dict = item as? [String: Any],
-        let data = dict[kSecValueData as String] as? Data
-      else { return status }
-      result = try? JSONDecoder().decode(Account.self, from: data)
-      return errSecSuccess
+        var item: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &item)
+        guard status == errSecSuccess, let dict = item as? [String: Any],
+          let data = dict[kSecValueData as String] as? Data
+        else { return status }
+        result = try? JSONDecoder().decode(Account.self, from: data)
+        return errSecSuccess
+      }
+      if result != nil { return result }
     }
-    return result
+    return nil
   }
 
   private func accountsSync() -> [Account] {
-    var accounts: [Account] = []
-    try? perform { dataProtection in
-      var query = baseQuery(dataProtection: dataProtection)
-      query[kSecReturnAttributes as String] = true
-      query[kSecReturnData as String] = true
-      query[kSecMatchLimit as String] = kSecMatchLimitAll
+    // 双模式读取并按 UUID 合并(同一账户可能只存在于其中一侧)
+    var merged: [UUID: Account] = [:]
+    for dataProtection in [true, false] {
+      _ = performIn(dataProtection) { dp in
+        var query = baseQuery(dataProtection: dp)
+        query[kSecReturnAttributes as String] = true
+        query[kSecReturnData as String] = true
+        query[kSecMatchLimit as String] = kSecMatchLimitAll
 
-      var items: CFTypeRef?
-      let status = SecItemCopyMatching(query as CFDictionary, &items)
-      guard status == errSecSuccess, let array = items as? [[String: Any]] else { return status }
-      accounts = array.compactMap { dict in
-        guard let data = dict[kSecValueData as String] as? Data else { return nil }
-        return try? JSONDecoder().decode(Account.self, from: data)
+        var items: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &items)
+        guard status == errSecSuccess, let array = items as? [[String: Any]] else { return status }
+        for dict in array {
+          guard let data = dict[kSecValueData as String] as? Data,
+            let account = try? JSONDecoder().decode(Account.self, from: data)
+          else { continue }
+          merged[account.id] = account
+        }
+        return errSecSuccess
       }
-      .sorted { $0.createdAt < $1.createdAt }
-      return errSecSuccess
     }
-    return accounts
+    return merged.values.sorted { $0.createdAt < $1.createdAt }
   }
 
   private func removeSync(id: UUID) throws {

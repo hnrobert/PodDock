@@ -12,22 +12,45 @@ struct DomainListView: View {
   private var model: DomainListModel { environment.domains }
 
   var body: some View {
+    // 注意:侧栏不能用 .searchable——同一窗口工具栏只允许一个搜索项,
+    // 与详情的 .searchable 并存会在 NSToolbar 插入时因标识符冲突抛异常崩溃
     List(selection: $selection) {
-      ForEach(model.filteredDomains) { domain in
-        DomainRowView(domain: domain) {
-          Task { await model.toggle(domain) }
-        }
-        .tag(domain.id)
-        .contextMenu {
-          Button(domain.state == .enable ? "Pause DNS" : "Resume DNS") {
+      Section {
+        ForEach(model.filteredDomains) { domain in
+          DomainRowView(domain: domain) {
             Task { await model.toggle(domain) }
           }
-          .disabled(domain.state == .spam || domain.state == .lock || domain.state == .unknown)
-          Divider()
-          Button("Remove Domain…", role: .destructive) {
-            pendingDelete = domain
+          .tag(domain.id)
+          .contextMenu {
+            Button(domain.state == .enable ? "Pause DNS" : "Resume DNS") {
+              Task { await model.toggle(domain) }
+            }
+            .disabled(domain.state == .spam || domain.state == .lock || domain.state == .unknown)
+            Divider()
+            Button("Remove Domain…", role: .destructive) {
+              pendingDelete = domain
+            }
           }
         }
+      } header: {
+        HStack(spacing: 6) {
+          Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+          TextField("", text: Binding(
+            get: { model.searchText },
+            set: { model.searchText = $0 }
+          ), prompt: Text("Search domains"))
+          .labelsHidden()
+          if !model.searchText.isEmpty {
+            Button {
+              model.searchText = ""
+            } label: {
+              Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+          }
+        }
+        .textFieldStyle(.plain)
+        .padding(.vertical, 2)
       }
     }
     .overlay {
@@ -38,10 +61,6 @@ struct DomainListView: View {
       }
     }
     .navigationTitle("Domains")
-    .searchable(text: Binding(
-      get: { model.searchText },
-      set: { model.searchText = $0 }
-    ), prompt: "Search domains")
     .toolbar {
       ToolbarItem(placement: .primaryAction) {
         Button {
