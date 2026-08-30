@@ -1,0 +1,59 @@
+{
+  "folders": [
+    {
+      "name": "PodDock",
+      "path": "."
+    },
+    {
+      "name": "DNSPodKit (SPM)",
+      "path": "DNSPodKit"
+    }
+  ],
+  "settings": {
+    "swift.sourcekit-lsp.serverPath": "/usr/bin/xcrun"
+  },
+  "launch": {
+    "configurations": [
+      {
+        "type": "swift",
+        "request": "launch",
+        "args": [],
+        "cwd": "${workspaceFolder:DNSPodKit (SPM)}",
+        "name": "Debug poddock-mcp (DNSPodKit (SPM))",
+        "target": "poddock-mcp",
+        "configuration": "debug",
+        "preLaunchTask": "swift: Build Debug poddock-mcp (DNSPodKit (SPM))"
+      },
+      {
+        "type": "swift",
+        "request": "launch",
+        "args": [],
+        "cwd": "${workspaceFolder:DNSPodKit (SPM)}",
+        "name": "Release poddock-mcp (DNSPodKit (SPM))",
+        "target": "poddock-mcp",
+        "configuration": "release",
+        "preLaunchTask": "swift: Build Release poddock-mcp (DNSPodKit (SPM))"
+      },
+      {
+        "type": "swift",
+        "request": "launch",
+        "args": [],
+        "cwd": "${workspaceFolder:DNSPodKit (SPM)}",
+        "name": "Debug poddock-capture (DNSPodKit (SPM))",
+        "target": "poddock-capture",
+        "configuration": "debug",
+        "preLaunchTask": "swift: Build Debug poddock-capture (DNSPodKit (SPM))"
+      },
+      {
+        "type": "swift",
+        "request": "launch",
+        "args": [],
+        "cwd": "${workspaceFolder:DNSPodKit (SPM)}",
+        "name": "Release poddock-capture (DNSPodKit (SPM))",
+        "target": "poddock-capture",
+        "configuration": "release",
+        "preLaunchTask": "swift: Build Release poddock-capture (DNSPodKit (SPM))"
+      }
+    ]
+  }
+}

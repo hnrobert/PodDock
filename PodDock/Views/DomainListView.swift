@@ -133,7 +133,7 @@ struct AddDomainSheet: View {
   var body: some View {
     VStack(spacing: 16) {
       Text("添加域名").font(.headline)
-      TextField("example.com", text: $name)
+      TextField("域名", text: $name, prompt: Text("example.com"))
         .textFieldStyle(.roundedBorder)
         .onSubmit(submit)
       if let errorMessage {

@@ -18,7 +18,7 @@ struct DoHPanelView: View {
       Text("解析生效检测").font(.headline)
 
       Form {
-        TextField("完整主机名,如 www.example.com", text: $initialName)
+        TextField("主机名", text: $initialName, prompt: Text("完整主机名,如 www.example.com"))
           .textFieldStyle(.roundedBorder)
           .onSubmit(run)
         HStack {

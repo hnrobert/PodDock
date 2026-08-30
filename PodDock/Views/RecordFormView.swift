@@ -47,7 +47,7 @@ struct RecordFormView: View {
       Form {
         Section("记录") {
           LabeledContent("主机记录") {
-            TextField("@ 或 www", text: $subDomain)
+            TextField("主机记录", text: $subDomain, prompt: Text("@ 或 www"))
           }
           LabeledContent("记录类型") {
             if let options, !options.types.isEmpty {
@@ -70,20 +70,20 @@ struct RecordFormView: View {
             }
           }
           LabeledContent("记录值") {
-            TextField(valueHint, text: $value)
+            TextField("记录值", text: $value, prompt: Text(valueHint))
           }
           if recordType == "MX" {
             LabeledContent("MX 优先级") {
-              TextField("10", text: $mxText)
+              TextField("MX 优先级", text: $mxText, prompt: Text("10"))
             }
           }
           LabeledContent("TTL(秒)") {
-            TextField("600", text: $ttlText)
+            TextField("TTL", text: $ttlText, prompt: Text("600"))
           }
         }
 
         Section("备注") {
-          TextField("可选", text: $remark)
+          TextField("备注", text: $remark, prompt: Text("可选"))
         }
 
         if isLoadingOptions {

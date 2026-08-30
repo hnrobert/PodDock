@@ -6,7 +6,7 @@ struct StatusBadge: View {
   let state: DomainState
 
   var body: some View {
-    Text(label)
+    Text(NSLocalizedString(label, comment: "domain state badge"))
       .font(.caption.weight(.medium))
       .padding(.horizontal, 8)
       .padding(.vertical, 2)

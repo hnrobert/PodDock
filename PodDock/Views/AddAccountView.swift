@@ -5,7 +5,6 @@ import DNSPodKit
 struct AddAccountView: View {
   @Environment(AppEnvironment.self) private var environment
 
-  @State private var pasted = ""
   @State private var tokenID = ""
   @State private var tokenKey = ""
   @State private var label = ""
@@ -27,23 +26,15 @@ struct AddAccountView: View {
         .multilineTextAlignment(.center)
 
       Form {
-        Section("一键粘贴") {
-          TextField("粘贴 Token(格式:ID,Token)", text: $pasted)
-            .onSubmit(applyPaste)
-          if !pasted.isEmpty {
-            Button("解析并填入", action: applyPaste)
-          }
-        }
-
-        Section("或手动填写") {
+        Section("DNSPod API Token") {
           LabeledContent("Token ID") {
-            TextField("例如 123456", text: $tokenID)
+            TextField("Token ID", text: $tokenID, prompt: Text("例如 123456"))
           }
           LabeledContent("Token Key") {
-            SecureField("密钥", text: $tokenKey)
+            SecureField("Token Key", text: $tokenKey, prompt: Text("密钥"))
           }
           LabeledContent("标签(可选)") {
-            TextField("显示名称,默认取 ID 后 4 位", text: $label)
+            TextField("标签", text: $label, prompt: Text("显示名称,默认取 ID 后 4 位"))
           }
         }
 
@@ -74,17 +65,7 @@ struct AddAccountView: View {
       .disabled(tokenID.isEmpty || tokenKey.isEmpty || isWorking)
     }
     .padding(32)
-    .frame(minWidth: 560, minHeight: 560)
-  }
-
-  private func applyPaste() {
-    guard let parsed = Account.parse(pasted: pasted) else {
-      errorMessage = "粘贴内容无法解析,需要 \"ID,Token\" 格式"
-      return
-    }
-    tokenID = parsed.id
-    tokenKey = parsed.token
-    errorMessage = nil
+    .frame(minWidth: 560, minHeight: 640)
   }
 
   private func submit() async {
