@@ -183,6 +183,15 @@ public struct LegacyClient: DNSPodClient {
 
   // MARK: - 底层调用
 
+  /// 调试 / fixture 抓取:信封校验后返回原始响应体。
+  /// 供 poddock-capture 抓真实响应进 Tests/DNSPodKitTests/Fixtures/。
+  public func rawResponse(_ action: String, _ params: [String: String]) async throws -> Data {
+    try await Self.raw(
+      action: action, params: params,
+      transport: transport, tokenID: tokenID, tokenKey: tokenKey,
+      baseURL: baseURL, userAgent: userAgent)
+  }
+
   private func call<T: Decodable>(_ action: String, _ params: [String: String]) async throws -> T {
     try await Self.rawDecoded(
       action: action, params: params,
@@ -224,6 +233,11 @@ public struct LegacyClient: DNSPodClient {
     }
 
     guard (200..<300).contains(response.statusCode) else {
+      // DNSPod 对无效 login_token 直接回 HTTP 401/403(不带业务信封)——归一为认证失败
+      if response.statusCode == 401 || response.statusCode == 403 {
+        throw DNSPodError.api(
+          code: 401, message: "认证失败(HTTP \(response.statusCode)):Token 无效或已过期")
+      }
       throw DNSPodError.transport("HTTP \(response.statusCode)")
     }
 

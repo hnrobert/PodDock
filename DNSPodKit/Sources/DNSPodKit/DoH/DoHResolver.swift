@@ -126,4 +126,58 @@ public struct DoHResolver: Sendable {
     default: 1
     }
   }
+
+  /// DoH 优先,失败回退系统解析(Apple 平台;结果必须标注来源)。
+  /// 仅 A 记录可回退;其余类型直接抛 DoH 的原始错误。
+  public func resolveWithFallback(name: String, recordType: String = "A") async throws -> DoHResult {
+    do {
+      return try await resolve(name: name, recordType: recordType)
+    } catch {
+      #if canImport(Darwin)
+        if recordType.uppercased() == "A" {
+          let addresses = SystemIPv4Resolver.resolve(name: name)
+          if !addresses.isEmpty {
+            return DoHResult(
+              name: name,
+              answers: addresses.map { DoHAnswer(type: 1, ttl: 0, data: $0) },
+              source: .system
+            )
+          }
+        }
+      #endif
+      throw error
+    }
+  }
 }
+
+#if canImport(Darwin)
+  import Darwin
+
+  /// getaddrinfo 直查 A 记录(系统解析回退,Apple 平台)
+  enum SystemIPv4Resolver {
+    static func resolve(name: String) -> [String] {
+      var hints = addrinfo()
+      hints.ai_family = AF_INET
+      var result: UnsafeMutablePointer<addrinfo>?
+      guard getaddrinfo(name, nil, &hints, &result) == 0, let first = result else { return [] }
+      defer { freeaddrinfo(result) }
+
+      var addresses: [String] = []
+      var node: UnsafeMutablePointer<addrinfo>? = first
+      while let current = node {
+        if current.pointee.ai_family == AF_INET, let sockaddrPtr = current.pointee.ai_addr {
+          sockaddrPtr.withMemoryRebound(to: sockaddr_in.self, capacity: 1) { sin in
+            var address = sin.pointee.sin_addr
+            var buffer = [CChar](repeating: 0, count: Int(INET_ADDRSTRLEN))
+            if inet_ntop(AF_INET, &address, &buffer, socklen_t(INET_ADDRSTRLEN)) != nil {
+              let chars = buffer.prefix { $0 != 0 }
+              addresses.append(String(decoding: chars.lazy.map { UInt8(bitPattern: $0) }, as: UTF8.self))
+            }
+          }
+        }
+        node = current.pointee.ai_next
+      }
+      return addresses
+    }
+  }
+#endif

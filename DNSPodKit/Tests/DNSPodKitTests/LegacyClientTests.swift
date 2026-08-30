@@ -307,10 +307,11 @@ struct LegacyClientTests {
     }
   }
 
-  @Test("非 2xx 响应映射为 transport 错误")
+  @Test("非 2xx 响应映射为 transport 错误;HTTP 401 归一为认证失败")
   func httpError() async throws {
     let mock = MockTransport()
     await mock.enqueue(.success(HTTPResponse(statusCode: 502, body: Data("bad gateway".utf8))))
+    await mock.enqueue(.success(HTTPResponse(statusCode: 401, body: Data("".utf8))))
     let client = makeClient(mock)
 
     do {
@@ -321,6 +322,19 @@ struct LegacyClientTests {
         Issue.record("应为 .transport,实际 \(error)")
         return
       }
+    }
+
+    // 401 → .api(401) 且判为认证失败(踢回账户页/登录提示)
+    do {
+      _ = try await client.listDomains()
+      Issue.record("应抛错")
+    } catch let error as DNSPodError {
+      guard case .api(let code, _) = error else {
+        Issue.record("应为 .api(401),实际 \(error)")
+        return
+      }
+      #expect(code == 401)
+      #expect(error.isAuthenticationFailure)
     }
   }
 

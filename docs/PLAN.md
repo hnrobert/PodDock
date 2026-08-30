@@ -19,7 +19,7 @@ PodDock 是 DNSPod 的原生 SwiftUI 客户端,2026-08-30 立项,从 dnspod-api-
 | 功能范围 | 域名/记录全 CRUD + 启停 + 备注;搜索/筛选/排序/批量/备注快编;DoH 生效检测;DDNS 远期 |
 | LLM 助手 | App 内自然语言操作:**本地执行**(App 直连 LLM,工具定义以 MCP 标准 schema 为统一契约,经 DNSPodKit 执行);危险操作仍走确认框 |
 | LLM 提供商 | 双协议可选:Anthropic 官方 `/v1/messages`(Swift 无官方 SDK,原生 HTTP 实现,默认 `claude-opus-5`)+ OpenAI 兼容端点(自定义 base URL + key) |
-| MCP 服务器 | **PodDockMCP**:Swift(官方 [modelcontextprotocol/swift-sdk](https://github.com/modelcontextprotocol/swift-sdk) + Hummingbird v2),**仅提供 Streamable HTTP 服务**(不做 stdio);同一服务库双宿主:① Linux 独立 executable(Docker 部署,`DNSPOD_TOKEN` 环境变量)② **内嵌于 macOS App**(共享当前账户与同一 DNSPodClient);App 内不出现任何外部 MCP 端点配置 |
+| MCP 服务器 | **PodDockMCP**:Swift(官方 [modelcontextprotocol/swift-sdk](https://github.com/modelcontextprotocol/swift-sdk) + Hummingbird v2),**仅提供 Streamable HTTP 服务**(不做 stdio);**启动零凭据**——客户端在会话内调用 `dnspod_login` 工具认证,凭据绑定 `Mcp-Session-Id` 会话(每客户端一套 transport+Server 连接池);同一服务库双宿主:① Linux 独立 executable(Docker 部署)② **内嵌于 macOS App**;App 内不出现任何外部 MCP 端点配置 |
 | 工程 | Xcode 工程 + 本地 SPM 包;`@Observable` MV;URLSession 自封装零依赖 |
 | 测试 | swift-testing 单测(DNSPodKit)+ XCUITest 关键流程(UI 测试只能 XCTest) |
 | UI | 系统风 + 品牌绿;macOS 首屏即域名列表;危险操作确认框;定制豌豆荚图标 |
@@ -123,9 +123,10 @@ protocol DNSPodClient: Sendable {
 ### PodDockMCP(同一服务库,双宿主)
 
 - 官方 [swift-sdk](https://github.com/modelcontextprotocol/swift-sdk)(client+server 双实现)+ Hummingbird v2,只暴露 **Streamable HTTP** 端点(不做 stdio);服务库与 API 调用解耦:注入任意 `DNSPodClient` 即工作
-- **宿主一:Linux 独立 executable**(`poddock-mcp`,Docker 部署):`DNSPOD_TOKEN`(`ID,Token`)环境变量供凭据,`MCP_AUTH_TOKEN` 可选 Bearer 保护端点
-- **宿主二:内嵌 macOS App**:设置内开关"本地 MCP 服务",监听 127.0.0.1,自动生成 Bearer token 并给出 `claude mcp add --transport http --header ...` 一键复制接入串;**共享 App 当前账户与同一 DNSPodClient**——外部 AI 客户端操作的就是 App 正在管的账号,无需任何 token 配置;iOS 不内嵌
-- 工具面 = `MCPToolCatalog`:list_domains / create_domain / set_domain_status / remove_domain / list_records / record_options / create_record / update_record / set_record_status / remove_record / set_record_remark / check_propagation(DoH);带 read-only / destructive 注解
+- **认证模型(启动零凭据)**:服务器不带任何内置 token;MCP 客户端在会话内调用 `dnspod_login` 工具(整串 "ID,Token" 或分字段)→ 服务端用 LegacyClient 验证(HTTP 401 归一为认证失败)→ 凭据绑定该 `Mcp-Session-Id` → 后续工具调用全部用会话 client;`dnspod_logout` 清除。`StatefulHTTPServerTransport` 是单会话 transport,多客户端由 `MCPConnectionPool` 每会话一套 transport+Server,空闲 1 小时回收
+- **宿主一:Linux 独立 executable**(`poddock-mcp`,Docker 部署):`MCP_AUTH_TOKEN` 可选 Bearer 保护端点(与账户认证相互独立)
+- **宿主二:内嵌 macOS App**:设置内开关"本地 MCP 服务",监听 127.0.0.1,自动生成 Bearer token 并给出 `claude mcp add --transport http --header ...` 一键复制接入串;客户端同样走 dnspod_login 认证(或注入共享当前账户的 client 工厂);iOS 不内嵌
+- 工具面 = `dnspod_login` / `dnspod_logout` + `MCPToolCatalog`:list_domains / create_domain / set_domain_status / remove_domain / list_records / record_options / create_record / update_record / set_record_status / remove_record / set_record_remark / check_propagation(DoH);带 read-only / destructive 注解
 - App 的 LLM 助手与 MCP **互不依赖**:助手本地执行(不经 MCP 协议),App 设置里没有外部 MCP 端点项;代价:App 经 PodDockMCP 库引入 swift-sdk + Hummingbird(纯 Swift,依赖与体积增量可接受)
 - 集成测试:swift-sdk 客户端经 HTTP 对测试内服务跑 initialize + tools/call 全链路(离线),同一 suite 覆盖两种宿主装配
 

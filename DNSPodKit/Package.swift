@@ -8,6 +8,7 @@ let package = Package(
     .library(name: "DNSPodKit", targets: ["DNSPodKit"]),
     .library(name: "PodDockMCP", targets: ["PodDockMCP"]),
     .executable(name: "poddock-mcp", targets: ["PodDockMCPCli"]),
+    .executable(name: "poddock-capture", targets: ["PodDockCapture"]),
   ],
   dependencies: [
     // MCP 官方 Swift SDK,尚未 1.0,API 会动 → 钉精确版本,升级时只动 PodDockMCP 层
@@ -25,6 +26,7 @@ let package = Package(
       ]
     ),
     .executableTarget(name: "PodDockMCPCli", dependencies: [.target(name: "PodDockMCP")]),
+    .executableTarget(name: "PodDockCapture", dependencies: [.target(name: "DNSPodKit")]),
     .testTarget(name: "DNSPodKitTests", dependencies: [.target(name: "DNSPodKit")]),
   ]
 )

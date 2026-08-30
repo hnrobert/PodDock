@@ -1,0 +1,44 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "swift: Build Debug poddock-mcp (DNSPodKit)",
+      "type": "shell",
+      "command": "swift build --product poddock-mcp",
+      "options": {
+        "cwd": "${workspaceFolder:PodDock}/DNSPodKit"
+      },
+      "group": "build",
+      "problemMatcher": "$swiftc"
+    },
+    {
+      "label": "swift: Build Release poddock-mcp (DNSPodKit)",
+      "type": "shell",
+      "command": "swift build --product poddock-mcp -c release",
+      "options": {
+        "cwd": "${workspaceFolder:PodDock}/DNSPodKit"
+      },
+      "problemMatcher": "$swiftc"
+    },
+    {
+      "label": "swift: Test DNSPodKit",
+      "type": "shell",
+      "command": "swift test",
+      "options": {
+        "cwd": "${workspaceFolder:PodDock}/DNSPodKit"
+      },
+      "group": "test",
+      "problemMatcher": "$swiftc"
+    },
+    {
+      "label": "xcodebuild: Build PodDock App (macOS)",
+      "type": "shell",
+      "command": "xcodebuild -project PodDock.xcodeproj -scheme PodDock -configuration Debug -destination 'platform=macOS' -derivedDataPath .build/DerivedData build CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO",
+      "options": {
+        "cwd": "${workspaceFolder:PodDock}"
+      },
+      "group": "build",
+      "problemMatcher": []
+    }
+  ]
+}

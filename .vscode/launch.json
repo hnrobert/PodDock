@@ -1,24 +1,25 @@
 {
-    "configurations": [
-        {
-            "type": "swift",
-            "request": "launch",
-            "args": [],
-            "cwd": "${workspaceFolder:PodDock}/DNSPodKit",
-            "name": "Debug poddock-mcp (DNSPodKit)",
-            "target": "poddock-mcp",
-            "configuration": "debug",
-            "preLaunchTask": "swift: Build Debug poddock-mcp (DNSPodKit)"
-        },
-        {
-            "type": "swift",
-            "request": "launch",
-            "args": [],
-            "cwd": "${workspaceFolder:PodDock}/DNSPodKit",
-            "name": "Release poddock-mcp (DNSPodKit)",
-            "target": "poddock-mcp",
-            "configuration": "release",
-            "preLaunchTask": "swift: Build Release poddock-mcp (DNSPodKit)"
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "swift",
+      "request": "launch",
+      "name": "MCP (poddock-mcp)",
+      "program": "${workspaceFolder:PodDock}/DNSPodKit/.build/debug/poddock-mcp",
+      "args": [],
+      "cwd": "${workspaceFolder:PodDock}/DNSPodKit",
+      "env": {},
+      "preLaunchTask": "swift: Build Debug poddock-mcp (DNSPodKit)"
+    },
+    {
+      "type": "swift",
+      "request": "launch",
+      "name": "App (macOS)",
+      "program": "${workspaceFolder:PodDock}/.build/DerivedData/Build/Products/Debug/PodDock.app/Contents/MacOS/PodDock",
+      "args": [],
+      "cwd": "${workspaceFolder:PodDock}",
+      "env": {},
+      "preLaunchTask": "xcodebuild: Build PodDock App (macOS)"
+    }
+  ]
 }

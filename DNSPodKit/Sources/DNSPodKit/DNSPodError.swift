@@ -20,8 +20,9 @@ public indirect enum DNSPodError: Error, Sendable {
     switch self {
     case .api(let code, _):
       // 1 成功 / 2 系统错误区 …常用认证相关:6 密码错、7 Token 无效、8 Token 过期、
-      // 9 Token 被禁用、16 账号被禁用、30 未授权(以实测 fixture 修正)
-      return [6, 7, 8, 9, 16, 30].contains(code)
+      // 9 Token 被禁用、16 账号被禁用、30 未授权;401 = DNSPod HTTP 级认证失败
+      //(以实测 fixture 修正)
+      return [6, 7, 8, 9, 16, 30, 401].contains(code)
     case .remarkFailed(let underlying):
       return underlying.isAuthenticationFailure
     default:
