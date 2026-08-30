@@ -21,6 +21,16 @@
         }
       }
     },
+    "API error (%lld): %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "API 错误(%lld):%@"
+          }
+        }
+      }
+    },
     "About": {
       "localizations": {
         "zh-Hans": {
@@ -461,6 +471,16 @@
         }
       }
     },
+    "Keychain operation failed (OSStatus %lld)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keychain 操作失败(OSStatus %lld)"
+          }
+        }
+      }
+    },
     "Label": {
       "localizations": {
         "zh-Hans": {
@@ -561,6 +581,16 @@
         }
       }
     },
+    "Network request failed: %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "网络请求失败:%@"
+          }
+        }
+      }
+    },
     "No Records": {
       "localizations": {
         "zh-Hans": {
@@ -577,6 +607,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "没有查询到记录——可能尚未生效或类型不符。"
+          }
+        }
+      }
+    },
+    "Not implemented: %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚未实现:%@"
           }
         }
       }
@@ -617,6 +657,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "打开 DNSPod 控制台创建 API Token"
+          }
+        }
+      }
+    },
+    "Operation succeeded, but saving the remark failed (%@)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作已成功,但备注保存失败(%@)"
           }
         }
       }
@@ -1137,6 +1187,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "类型"
+          }
+        }
+      }
+    },
+    "Unexpected response format: %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "响应格式异常:%@"
           }
         }
       }

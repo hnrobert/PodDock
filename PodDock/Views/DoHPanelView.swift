@@ -99,7 +99,7 @@ struct DoHPanelView: View {
       do {
         result = try await resolver.resolveWithFallback(name: initialName, recordType: recordType)
       } catch {
-        errorMessage = error.localizedDescription
+        errorMessage = describeError(error)
       }
     }
   }

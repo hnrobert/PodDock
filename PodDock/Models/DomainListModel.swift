@@ -34,9 +34,9 @@ final class DomainListModel {
       if error.isAuthenticationFailure, let environment {
         await environment.handleAuthenticationFailure()
       }
-      errorMessage = error.localizedDescription
+      errorMessage = describeError(error)
     } catch {
-      errorMessage = error.localizedDescription
+      errorMessage = describeError(error)
     }
   }
 
@@ -47,7 +47,7 @@ final class DomainListModel {
       await load()
       return true
     } catch {
-      errorMessage = error.localizedDescription
+      errorMessage = describeError(error)
       return false
     }
   }
@@ -60,7 +60,7 @@ final class DomainListModel {
       try await client.setDomainStatus(id: domain.id, to: target)
       await load()
     } catch {
-      errorMessage = error.localizedDescription
+      errorMessage = describeError(error)
     }
   }
 
@@ -70,7 +70,7 @@ final class DomainListModel {
       try await client.removeDomain(id: domain.id)
       domains.removeAll { $0.id == domain.id }
     } catch {
-      errorMessage = error.localizedDescription
+      errorMessage = describeError(error)
     }
   }
 }

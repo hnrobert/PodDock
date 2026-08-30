@@ -67,14 +67,21 @@ final class AppEnvironment {
     accounts.first { $0.id == preferences.currentAccountID }
   }
 
-  /// client 工厂:按账户的 API 风味装配对应实现
+  /// client 工厂:按账户的 API 风味装配对应实现;
+  /// `lang` 跟随系统语言,让 DNSPod 服务端错误消息也用对应语言返回
   static func makeClient(for account: Account) -> DNSPodClient {
     switch account.apiFlavor {
     case .legacy:
-      LegacyClient(tokenID: account.loginTokenID, tokenKey: account.loginToken)
+      LegacyClient(
+        tokenID: account.loginTokenID, tokenKey: account.loginToken,
+        lang: preferredAPILanguage)
     case .tencentCloud:
       TencentCloudClient()
     }
+  }
+
+  static var preferredAPILanguage: String {
+    Locale.current.language.languageCode?.identifier.hasPrefix("zh") == true ? "cn" : "en"
   }
 
   /// 添加账户:先用临时 client 验证凭据(Domain.List 兼任),通过才落 Keychain

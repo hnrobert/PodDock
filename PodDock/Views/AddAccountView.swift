@@ -78,7 +78,7 @@ struct AddAccountView: View {
         tokenKey: tokenKey.trimmingCharacters(in: .whitespaces),
         label: label.isEmpty ? nil : label)
     } catch {
-      errorMessage = error.localizedDescription
+      errorMessage = describeError(error)
     }
   }
 }

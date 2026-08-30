@@ -168,7 +168,7 @@ struct RecordFormView: View {
       }
     } catch {
       errorMessage = String(
-        localized: "Failed to load types/lines: \(error.localizedDescription) (you can type manually)")
+        localized: "Failed to load types/lines: \(describeError(error)) (you can type manually)")
     }
   }
 
@@ -202,9 +202,9 @@ struct RecordFormView: View {
           dismiss()
           return
         }
-        errorMessage = error.localizedDescription
+        errorMessage = describeError(error)
       } catch {
-        errorMessage = error.localizedDescription
+        errorMessage = describeError(error)
       }
     }
   }

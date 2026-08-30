@@ -16,6 +16,8 @@ public struct LegacyClient: DNSPodClient {
   private let tokenKey: String
   private let baseURL: URL
   private let userAgent: String
+  /// 服务端错误消息语言(传统 API 支持 cn/en);App 按系统语言选择
+  private let lang: String
   private let optionsProvider: RecordOptionsProvider
 
   public init(
@@ -24,6 +26,7 @@ public struct LegacyClient: DNSPodClient {
     transport: HTTPTransport = URLSessionTransport(),
     baseURL: URL = LegacyClient.defaultBaseURL,
     userAgent: String = LegacyClient.defaultUserAgent,
+    lang: String = "cn",
     optionsProvider: RecordOptionsProvider? = nil
   ) {
     self.tokenID = tokenID
@@ -31,23 +34,24 @@ public struct LegacyClient: DNSPodClient {
     self.transport = transport
     self.baseURL = baseURL
     self.userAgent = userAgent
+    self.lang = lang
     // type 按 grade 缓存、line 按 domain_id 缓存——传统 API 的行为知识,留在 Kit 内
     self.optionsProvider = optionsProvider ?? RecordOptionsProvider(
-      fetchTypes: { [transport, baseURL, userAgent, tokenID, tokenKey] grade in
+      fetchTypes: { [transport, baseURL, userAgent, tokenID, tokenKey, lang] grade in
         let response: RecordTypesResponse = try await LegacyClient.rawDecoded(
           action: "Record.Type",
           params: ["domain_grade": grade],
           transport: transport, tokenID: tokenID, tokenKey: tokenKey,
-          baseURL: baseURL, userAgent: userAgent
+          baseURL: baseURL, userAgent: userAgent, lang: lang
         )
         return response.types ?? []
       },
-      fetchLines: { [transport, baseURL, userAgent, tokenID, tokenKey] domainID, grade in
+      fetchLines: { [transport, baseURL, userAgent, tokenID, tokenKey, lang] domainID, grade in
         let response: RecordLinesResponse = try await LegacyClient.rawDecoded(
           action: "Record.Line",
           params: ["domain_id": domainID.rawValue, "domain_grade": grade],
           transport: transport, tokenID: tokenID, tokenKey: tokenKey,
-          baseURL: baseURL, userAgent: userAgent
+          baseURL: baseURL, userAgent: userAgent, lang: lang
         )
         return response.lines ?? []
       }
@@ -189,14 +193,14 @@ public struct LegacyClient: DNSPodClient {
     try await Self.raw(
       action: action, params: params,
       transport: transport, tokenID: tokenID, tokenKey: tokenKey,
-      baseURL: baseURL, userAgent: userAgent)
+      baseURL: baseURL, userAgent: userAgent, lang: lang)
   }
 
   private func call<T: Decodable>(_ action: String, _ params: [String: String]) async throws -> T {
     try await Self.rawDecoded(
       action: action, params: params,
       transport: transport, tokenID: tokenID, tokenKey: tokenKey,
-      baseURL: baseURL, userAgent: userAgent)
+      baseURL: baseURL, userAgent: userAgent, lang: lang)
   }
 
   /// 发起一次传统 API 调用并完成信封校验(静态方法便于 optionsProvider 闭包复用)
@@ -207,12 +211,13 @@ public struct LegacyClient: DNSPodClient {
     tokenID: String,
     tokenKey: String,
     baseURL: URL,
-    userAgent: String
+    userAgent: String,
+    lang: String = "cn"
   ) async throws -> Data {
     var fields = params
     fields["login_token"] = "\(tokenID),\(tokenKey)"
     fields["format"] = "json"
-    fields["lang"] = "cn"
+    fields["lang"] = lang
     fields["error_on_empty"] = "no"
 
     let request = HTTPRequest(
@@ -269,12 +274,13 @@ extension LegacyClient {
     tokenID: String,
     tokenKey: String,
     baseURL: URL,
-    userAgent: String
+    userAgent: String,
+    lang: String = "cn"
   ) async throws -> T {
     let data = try await raw(
       action: action, params: params,
       transport: transport, tokenID: tokenID, tokenKey: tokenKey,
-      baseURL: baseURL, userAgent: userAgent)
+      baseURL: baseURL, userAgent: userAgent, lang: lang)
     do {
       return try JSONDecoder().decode(T.self, from: data)
     } catch {

@@ -80,9 +80,9 @@ final class RecordListModel {
       if error.isAuthenticationFailure, let environment {
         await environment.handleAuthenticationFailure()
       }
-      errorMessage = error.localizedDescription
+      errorMessage = describeError(error)
     } catch {
-      errorMessage = error.localizedDescription
+      errorMessage = describeError(error)
     }
   }
 
@@ -93,7 +93,7 @@ final class RecordListModel {
       try await client.setRecordStatus(id: record.id, domainID: domain.id, to: target)
       await load()
     } catch {
-      errorMessage = error.localizedDescription
+      errorMessage = describeError(error)
     }
   }
 
@@ -103,7 +103,7 @@ final class RecordListModel {
       try await client.removeRecord(id: record.id, domainID: domain.id)
       records.removeAll { $0.id == record.id }
     } catch {
-      errorMessage = error.localizedDescription
+      errorMessage = describeError(error)
     }
   }
 
@@ -114,7 +114,7 @@ final class RecordListModel {
       await load()
       latestMessage = String(localized: "Remark updated")
     } catch {
-      errorMessage = error.localizedDescription
+      errorMessage = describeError(error)
     }
   }
 
@@ -139,7 +139,7 @@ final class RecordListModel {
           try await client.removeRecord(id: record.id, domainID: domain.id)
         }
       } catch {
-        failures.append("\(record.name): \(error.localizedDescription)")
+        failures.append("\(record.name): \(describeError(error))")
       }
     }
     await load()
