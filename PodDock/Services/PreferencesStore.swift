@@ -20,11 +20,37 @@ final class PreferencesStore {
     {
       preferredDoHProvider = provider
     }
+    if let raw = defaults.string(forKey: Self.llmProviderKey),
+      let kind = LLMProviderKind(rawValue: raw)
+    {
+      llmProvider = kind
+    }
+    if let raw = defaults.string(forKey: Self.llmModelKey) {
+      llmModel = raw
+    }
+    if let raw = defaults.string(forKey: Self.llmBaseURLKey) {
+      llmBaseURL = raw
+    }
+  }
+
+  var llmProvider: LLMProviderKind = .anthropic {
+    didSet { defaults.set(llmProvider.rawValue, forKey: Self.llmProviderKey) }
+  }
+
+  var llmModel: String = "" {
+    didSet { defaults.set(llmModel, forKey: Self.llmModelKey) }
+  }
+
+  var llmBaseURL: String = "" {
+    didSet { defaults.set(llmBaseURL, forKey: Self.llmBaseURLKey) }
   }
 
   private static let currentAccountKey = "preferences.currentAccountID"
   private static let appLockKey = "preferences.appLockEnabled"
   private static let dohProviderKey = "preferences.dohProvider"
+  private static let llmProviderKey = "preferences.llmProvider"
+  private static let llmModelKey = "preferences.llmModel"
+  private static let llmBaseURLKey = "preferences.llmBaseURL"
 
   var currentAccountID: UUID? = nil {
     didSet {

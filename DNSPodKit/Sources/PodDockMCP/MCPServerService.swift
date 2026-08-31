@@ -2,8 +2,22 @@ import Foundation
 import NIOCore
 import Hummingbird
 import HTTPTypes
+import ServiceLifecycle
 import MCP
 import DNSPodKit
+
+/// MCP 会话认证错误(区别于 ToolDispatch 的参数错误)
+enum MCPAuthError: Error, LocalizedError {
+  case notAuthenticated
+  case missingParameter(String)
+
+  var errorDescription: String? {
+    switch self {
+    case .notAuthenticated: "Not authenticated: call dnspod_login in this session first"
+    case .missingParameter(let name): "Missing parameter: \(name)"
+    }
+  }
+}
 
 // MARK: - 会话凭据仓
 
@@ -116,7 +130,20 @@ public final class MCPServerService: Sendable {
 
   // MARK: - 启动
 
-  /// 组装 Hummingbird 应用并阻塞服务(Linux 宿主用;App 内嵌宿主放后台 Task)
+  /// 内嵌宿主句柄:run 阻塞服务,stop 触发优雅停机(macOS App 内嵌用)
+  public struct HostHandle: Sendable {
+    let group: ServiceGroup
+
+    public func run() async throws {
+      try await group.run()
+    }
+
+    public func stop() async {
+      await group.triggerGracefulShutdown()
+    }
+  }
+
+  /// 组装 Hummingbird 应用并阻塞服务(Linux 宿主用;App 内嵌宿主用 startHost)
   public func run() async throws {
     // 空闲连接回收(每小时一次,1 小时未用即清)
     let pool = self.pool
@@ -127,6 +154,15 @@ public final class MCPServerService: Sendable {
       }
     }
 
+    try await makeApplication().runService()
+  }
+
+  /// 组装应用(不启动);内嵌宿主拿 ServiceGroup 自行 run/stop
+  public func startHost() async throws -> HostHandle {
+    HostHandle(group: ServiceGroup(services: [makeApplication()]))
+  }
+
+  private func makeApplication() -> some ApplicationProtocol {
     let router = Router()
     let service = self
 
@@ -140,11 +176,10 @@ public final class MCPServerService: Sendable {
       try await service.handle(request: request, hasBody: false, closeAfter: true)
     }
 
-    let app = Application(
+    return Application(
       router: router,
       configuration: .init(address: .hostname(configuration.host, port: configuration.port))
     )
-    try await app.runService()
   }
 
   // MARK: - 请求处理
@@ -275,7 +310,7 @@ public final class MCPServerService: Sendable {
       do {
         return try await Self.handleToolCall(
           params: params, sessions: sessions, makeClient: makeClient)
-      } catch let error as MCPToolDispatch.DispatchError {
+      } catch let error as MCPAuthError {
         return CallTool.Result(content: [.text(error.localizedDescription)], isError: true)
       } catch let error as DNSPodError {
         return CallTool.Result(content: [.text(error.localizedDescription)], isError: true)
@@ -296,7 +331,7 @@ public final class MCPServerService: Sendable {
 
     func requireSessionID() throws -> String {
       guard let sessionID, !sessionID.isEmpty else {
-        throw MCPToolDispatch.DispatchError.notAuthenticated
+        throw MCPAuthError.notAuthenticated
       }
       return sessionID
     }
@@ -311,7 +346,7 @@ public final class MCPServerService: Sendable {
       {
         parsed = (id, key)
       } else {
-        throw MCPToolDispatch.DispatchError.missingParameter("token(或 token_id + token_key)")
+        throw MCPAuthError.missingParameter("token(或 token_id + token_key)")
       }
 
       let client = makeClient(parsed.id, parsed.token)
@@ -331,10 +366,12 @@ public final class MCPServerService: Sendable {
     default:
       let sessionID = try requireSessionID()
       guard let entry = await sessions.entry(for: sessionID) else {
-        throw MCPToolDispatch.DispatchError.notAuthenticated
+        throw MCPAuthError.notAuthenticated
       }
-      let output = try await MCPToolDispatch.dispatch(
-        name: params.name, arguments: params.arguments, client: entry.client)
+      let output = try await ToolDispatch.dispatch(
+        name: params.name,
+        arguments: MCPArgumentBridge.convert(params.arguments),
+        client: entry.client)
       return CallTool.Result(content: [.text(output)], isError: false)
     }
   }

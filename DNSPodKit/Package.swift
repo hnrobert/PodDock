@@ -14,6 +14,8 @@ let package = Package(
     // MCP 官方 Swift SDK,尚未 1.0,API 会动 → 钉精确版本,升级时只动 PodDockMCP 层
     .package(url: "https://github.com/modelcontextprotocol/swift-sdk", exact: "0.12.1"),
     .package(url: "https://github.com/hummingbird-project/hummingbird", exact: "2.26.0"),
+    .package(
+      url: "https://github.com/swift-server/swift-service-lifecycle", exact: "2.12.0"),
   ],
   targets: [
     .target(name: "DNSPodKit"),
@@ -23,6 +25,7 @@ let package = Package(
         .target(name: "DNSPodKit"),
         .product(name: "MCP", package: "swift-sdk"),
         .product(name: "Hummingbird", package: "hummingbird"),
+        .product(name: "ServiceLifecycle", package: "swift-service-lifecycle"),
       ]
     ),
     .executableTarget(name: "PodDockMCPCli", dependencies: [.target(name: "PodDockMCP")]),

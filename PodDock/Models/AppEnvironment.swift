@@ -10,6 +10,8 @@ final class AppEnvironment {
   let preferences: PreferencesStore
   let lock: AppLockController
   let domains: DomainListModel
+  let assistant: AssistantModel
+  let mcpHost: MCPHostService
   let isMockMode: Bool
 
   private(set) var accounts: [Account] = []
@@ -30,6 +32,8 @@ final class AppEnvironment {
     let prefs = preferences ?? PreferencesStore()
     self.preferences = prefs
     lock = AppLockController(preferences: prefs)
+    assistant = AssistantModel()
+    mcpHost = MCPHostService()
 
     #if DEBUG
       if isMock {
@@ -53,6 +57,9 @@ final class AppEnvironment {
 
   /// 启动装配:读账户 → 恢复当前账户 → 拉域名
   func bootstrap() async {
+    domains.attach(environment: self)
+    assistant.attach(environment: self)
+    mcpHost.attach(environment: self)
     if isMockMode {
       // mock 模式:client 已在 init 注入(activate 会用真实实现覆盖它)
       await domains.load()

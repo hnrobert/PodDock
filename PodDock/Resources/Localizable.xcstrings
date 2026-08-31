@@ -21,6 +21,26 @@
         }
       }
     },
+    "AI Assistant": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 助手"
+          }
+        }
+      }
+    },
+    "API Key": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "API Key"
+          }
+        }
+      }
+    },
     "API error (%lld): %@": {
       "localizations": {
         "zh-Hans": {
@@ -111,12 +131,62 @@
         }
       }
     },
+    "Allow %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "允许 %@"
+          }
+        }
+      }
+    },
+    "Anthropic": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anthropic"
+          }
+        }
+      }
+    },
+    "Ask anything about your DNS…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "随便问你的 DNS…"
+          }
+        }
+      }
+    },
+    "Assistant": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "助手"
+          }
+        }
+      }
+    },
     "Banned": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "封禁"
+          }
+        }
+      }
+    },
+    "Base URL": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Base URL"
           }
         }
       }
@@ -191,12 +261,32 @@
         }
       }
     },
+    "Cancelled": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已取消"
+          }
+        }
+      }
+    },
     "Check via DoH": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "DoH 检测"
+          }
+        }
+      }
+    },
+    "Clear": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清空"
           }
         }
       }
@@ -251,12 +341,32 @@
         }
       }
     },
+    "Copy": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制"
+          }
+        }
+      }
+    },
     "Credentials for %@ are no longer valid; please re-add the account.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "账户 %@ 的凭据已失效,请重新添加。"
+          }
+        }
+      }
+    },
+    "DNS Assistant": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DNS 助手"
           }
         }
       }
@@ -277,6 +387,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "DNSPod 控制台"
+          }
+        }
+      }
+    },
+    "Decline": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拒绝"
           }
         }
       }
@@ -381,12 +501,32 @@
         }
       }
     },
+    "Endpoint": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "端点"
+          }
+        }
+      }
+    },
     "Error": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "出错了"
+          }
+        }
+      }
+    },
+    "External AI clients operate the same account as this app. The bearer token is endpoint protection, independent of DNSPod credentials.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外部 AI 客户端操作的是 App 正在管理的同一账户。Bearer 仅保护端点,与 DNSPod 凭据相互独立。"
           }
         }
       }
@@ -491,6 +631,26 @@
         }
       }
     },
+    "LLM provider is not configured — set it up in Settings": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LLM 未配置——请先在设置中完成配置"
+          }
+        }
+      }
+    },
+    "LLM request failed (HTTP %lld): %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LLM 请求失败(HTTP %lld):%@"
+          }
+        }
+      }
+    },
     "Label": {
       "localizations": {
         "zh-Hans": {
@@ -591,12 +751,32 @@
         }
       }
     },
+    "Model": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "模型"
+          }
+        }
+      }
+    },
     "Network request failed: %@": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "网络请求失败:%@"
+          }
+        }
+      }
+    },
+    "No DNSPod account — add one first.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚无 DNSPod 账户——请先添加。"
           }
         }
       }
@@ -667,6 +847,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "打开 DNSPod 控制台创建 API Token"
+          }
+        }
+      }
+    },
+    "OpenAI-compatible": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OpenAI 兼容"
           }
         }
       }
@@ -776,7 +966,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "服务商"
+            "value": "提供商"
           }
         }
       }
@@ -906,7 +1096,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "删除"
+            "value": "移除"
           }
         }
       }
@@ -1017,6 +1207,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "启用解析"
+          }
+        }
+      }
+    },
+    "Run MCP server on this Mac": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在本机运行 MCP 服务"
           }
         }
       }
@@ -1161,6 +1361,16 @@
         }
       }
     },
+    "The key is stored only in this Mac's Keychain. Write operations always require your confirmation.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密钥只保存在本机 Keychain。写操作始终需要你的确认。"
+          }
+        }
+      }
+    },
     "Token ID": {
       "localizations": {
         "zh-Hans": {
@@ -1191,12 +1401,42 @@
         }
       }
     },
+    "Tool loop limit reached": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "工具循环达到上限"
+          }
+        }
+      }
+    },
+    "Try: “list my domains” or “point www of example.com to 1.2.3.4”": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "试试:「列出我的域名」或「把 example.com 的 www 指向 1.2.3.4」"
+          }
+        }
+      }
+    },
     "Type": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "类型"
+          }
+        }
+      }
+    },
+    "Unexpected LLM response: %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LLM 响应异常:%@"
           }
         }
       }

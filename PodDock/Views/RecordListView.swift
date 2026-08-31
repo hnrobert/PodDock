@@ -15,6 +15,7 @@ struct RecordListView: View {
   @State private var remarkRecord: DNSRecord?
   @State private var remarkDraft = ""
   @State private var isShowingDoH = false
+  @State private var isShowingAssistant = false
   @State private var doHName = ""
   @State private var pendingDelete: DNSRecord?
   @State private var pendingBatchDelete: [DNSRecord]?
@@ -43,6 +44,10 @@ struct RecordListView: View {
       }
       .sheet(isPresented: $isShowingDoH) {
         DoHPanelView(initialName: doHName)
+      }
+      .sheet(isPresented: $isShowingAssistant) {
+        AssistantView()
+          .environment(environment)
       }
       .modifier(RecordDialogsLayer(
         pendingDelete: $pendingDelete,
@@ -136,6 +141,13 @@ struct RecordListView: View {
           isSelecting ? "Done Selecting" : "Select",
           systemImage: isSelecting ? "checkmark.circle.fill" : "checkmark.circle"
         )
+      }
+    }
+    ToolbarItem(placement: .automatic) {
+      Button {
+        isShowingAssistant = true
+      } label: {
+        Label("Assistant", systemImage: "sparkles")
       }
     }
   }

@@ -7,6 +7,7 @@
 
 /* Begin PBXBuildFile section */
 		888888888888888888888888 /* DNSPodKit in Frameworks */ = {isa = PBXBuildFile; productRef = 777777777777777777777777 /* DNSPodKit */; };
+		888888888888888888888889 /* PodDockMCP in Frameworks */ = {isa = PBXBuildFile; productRef = 777777777777777777777778 /* PodDockMCP */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -20,6 +21,7 @@
 /* Begin PBXFrameworksBuildPhase section */
 		999999999999999999999992 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (
 				888888888888888888888888 /* DNSPodKit in Frameworks */,
+				888888888888888888888889 /* PodDockMCP in Frameworks */,
 			); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXFrameworksBuildPhase section */
 
@@ -61,6 +63,7 @@
 			name = PodDock;
 			packageProductDependencies = (
 				777777777777777777777777 /* DNSPodKit */,
+				777777777777777777777778 /* PodDockMCP */,
 			);
 			productName = PodDock;
 			productReference = 333333333333333333333333 /* PodDock.app */;
@@ -325,6 +328,7 @@
 
 /* Begin XCSwiftPackageProductDependency section */
 		777777777777777777777777 /* DNSPodKit */ = {isa = XCSwiftPackageProductDependency; productName = DNSPodKit; };
+		777777777777777777777778 /* PodDockMCP */ = {isa = XCSwiftPackageProductDependency; productName = PodDockMCP; };
 /* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 111111111111111111111111 /* Project object */;
