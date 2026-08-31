@@ -9,9 +9,6 @@
       "path": "DNSPodKit"
     }
   ],
-  "settings": {
-    "swift.sourcekit-lsp.serverPath": "/usr/bin/xcrun"
-  },
   "launch": {
     "configurations": [
       {
