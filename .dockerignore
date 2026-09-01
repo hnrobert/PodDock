@@ -1,0 +1,25 @@
+# VCS
+.git
+.gitignore
+.gitattributes
+
+# Swift build artifacts (local checkouts + objects can be gigabytes)
+**/.build
+.build
+
+# Xcode
+**/DerivedData
+DerivedData
+xcuserdata
+*.xcresult
+
+# App sources — the image only builds the poddock-mcp server
+PodDock.xcodeproj
+PodDock/
+Config/
+docs/
+demo/
+.vscode
+*.md
+Dockerfile
+.dockerignore
