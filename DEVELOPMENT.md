@@ -106,6 +106,7 @@ Joining the Apple Developer Program unlocks Developer ID signing + notarization,
 
 | Symptom | Cause |
 | --- | --- |
+| CI: `No signing certificate … with a private key was found` | The exported `.p12` contains the certificate but **not its private key** — re-export from **My Certificates**, selecting both the certificate and the key. Verify locally first: `openssl pkcs12 -info -in cert.p12 -nodes -noout -passin pass:<pw> \| grep -c "PRIVATE KEY"` (must print `1`) |
 | App "cannot be opened" on another Mac | Expected without notarization — right-click → Open, or clear the quarantine attribute |
 | `security import` fails / wrong password | `APPLE_CERTIFICATE_PASSWORD` does not match the `.p12`, or `APPLE_CERTIFICATE_BASE64` got line-wrapped |
 | Archive: "requires a development team" | The imported certificate is not an **Apple Development** identity (export the one from Keychain Access → My Certificates) |

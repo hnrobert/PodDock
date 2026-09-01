@@ -53,10 +53,20 @@ jobs:
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" build.keychain
           rm -f "$CERTFILE"
+
+          # Fail fast with a readable message if the identity is unusable
+          IDENTITIES=$(security find-identity -v -p codesigning build.keychain)
+          echo "$IDENTITIES"
+          if ! echo "$IDENTITIES" | grep -q "1 valid identities"; then
+            echo "::error::No signing identity with a PRIVATE KEY was imported." \
+              "The .p12 was probably exported without its private key." \
+              "Re-export from Keychain Access → My Certificates, selecting BOTH the certificate AND the key (see DEVELOPMENT.md)."
+            exit 1
+          fi
+
           # Extract the team id from the imported identity (pbxproj has none baked in)
-          security find-identity -v -p codesigning build.keychain \
-            | grep -oE '\(([A-Z0-9]{10})\)' | head -1 | tr -d '()' > team_id.txt
-          echo "TEAM_ID=$(cat team_id.txt)" >> "$GITHUB_ENV"
+          TEAM_ID=$(echo "$IDENTITIES" | grep -oE '\(([A-Z0-9]{10})\)' | head -1 | tr -d '()')
+          echo "TEAM_ID=$TEAM_ID" >> "$GITHUB_ENV"
 
       - name: Build and archive app
         run: |
@@ -64,8 +74,9 @@ jobs:
             -configuration Release -destination "generic/platform=macOS" \
             -archivePath build/PodDock.xcarchive \
             ARCHS=arm64 ONLY_ACTIVE_ARCH=YES \
-            DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="Apple Development" \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
             archive
 
       - name: Package
