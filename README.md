@@ -25,7 +25,7 @@ The API layer is a dual-implementation adapter: v1 ships the legacy API (`dnsapi
 
 ## Documentation
 
-- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) — building, IDE setup, release pipeline and its secrets
+- [DEVELOPMENT.md](DEVELOPMENT.md) — building, IDE setup, release pipeline and its secrets
 - [docs/PLAN.md](docs/PLAN.md) — milestones and architecture decisions
 
 ## Status
