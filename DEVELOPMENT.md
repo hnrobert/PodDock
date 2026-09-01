@@ -44,7 +44,7 @@ Add them under **Settings → Secrets and variables → Actions**:
 | Secret | Value |
 | --- | --- |
 | `APPLE_CERTIFICATE_BASE64` | Your Apple Development certificate `.p12`, base64-encoded: `base64 -i cert.p12 \| pbcopy` |
-| `APPLE_CERTIFICATE_PASSWORD` | The password set when exporting that `.p12` |
+| `APPLE_CERTIFICATE_PASSWORD` | The password set when exporting that `.p12`. **If the `.p12` has no password, skip this secret entirely** — GitHub rejects empty secrets, and an unset secret evaluates to the empty string, which is exactly what the import step passes |
 | `KEYCHAIN_PASSWORD` | Any random string (`openssl rand -hex 20`) — password of the throwaway CI keychain |
 
 The team ID is parsed automatically from the imported certificate; no separate secret for it. No Apple ID or app-specific password is needed — signing alone does not involve them.
@@ -61,8 +61,19 @@ Verify and export it:
    - Check the expiry date in the cert details; anything in the future is fine.
 3. Select **both** the certificate **and** its private key (⌘-click), then **File → Export Items**.
    - Format: **Personal Information Exchange (.p12)**
-   - Set a password — this becomes `APPLE_CERTIFICATE_PASSWORD`.
-4. Encode it:
+   - Setting a password is optional (see the secrets table above for the no-password case).
+4. Verify the export with the same operation CI performs — a scratch-keychain import. This is the authoritative test; `openssl pkcs12` is **not** reliable here because macOS Keychain exports use legacy RC2 encryption that OpenSSL 3 rejects even for perfectly valid files:
+
+```bash
+security create-keychain -p t /tmp/t.keychain
+security import Certificates.p12 -k /tmp/t.keychain -P "" -T /usr/bin/codesign
+security find-identity -v -p codesigning /tmp/t.keychain
+security delete-keychain /tmp/t.keychain
+```
+
+The middle command must print `1 identity imported`, and the listing must show `1 valid identities found` with your `Apple Development: …` name. Anything else — most commonly `0 valid identities` — means the export lacks the private key: redo step 3 making sure the **key** is selected too.
+
+5. Encode it:
 
 ```bash
 base64 -i ~/Desktop/certificate.p12 | pbcopy   # macOS clipboard; paste into APPLE_CERTIFICATE_BASE64
@@ -106,7 +117,7 @@ Joining the Apple Developer Program unlocks Developer ID signing + notarization,
 
 | Symptom | Cause |
 | --- | --- |
-| CI: `No signing certificate … with a private key was found` | The exported `.p12` contains the certificate but **not its private key** — re-export from **My Certificates**, selecting both the certificate and the key. Verify locally first: `openssl pkcs12 -info -in cert.p12 -nodes -noout -passin pass:<pw> \| grep -c "PRIVATE KEY"` (must print `1`) |
+| CI: `No signing certificate … with a private key was found` | The exported `.p12` contains the certificate but **not its private key** — re-export from **My Certificates**, selecting both the certificate and the key. Verify with the scratch-keychain import in "Obtaining the certificate" above (`1 valid identities found` = good). Don't use `openssl pkcs12` to check — OpenSSL 3 misreports valid Keychain exports as broken |
 | App "cannot be opened" on another Mac | Expected without notarization — right-click → Open, or clear the quarantine attribute |
 | `security import` fails / wrong password | `APPLE_CERTIFICATE_PASSWORD` does not match the `.p12`, or `APPLE_CERTIFICATE_BASE64` got line-wrapped |
 | Archive: "requires a development team" | The imported certificate is not an **Apple Development** identity (export the one from Keychain Access → My Certificates) |
