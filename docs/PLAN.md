@@ -24,7 +24,7 @@ PodDock 是 DNSPod 的原生 SwiftUI 客户端,2026-08-30 立项,从 dnspod-api-
 | 测试 | swift-testing 单测(DNSPodKit)+ XCUITest 关键流程(UI 测试只能 XCTest) |
 | UI | 系统风 + 品牌绿;macOS 首屏即域名列表;危险操作确认框;定制豌豆荚图标 |
 | CI | 参考 MultiScreenCapturer 模式,但 action 版本升级、修正脆弱判定、补 notarization |
-| 其他 | README 仅中文;版本 0.1.0 起;远期:菜单栏、小组件+快捷指令、watchOS、CLI |
+| 其他 | README 与文档全英文;版本 0.1.0 起;远期:菜单栏、小组件+快捷指令、watchOS、CLI |
 
 传统 API 公共参数(官方文档已核实):`login_token`=`ID,Token`、`format=json`、`lang=cn`、`error_on_empty=no`;仅主账号;官方已标 legacy(适配层即对冲)。
 

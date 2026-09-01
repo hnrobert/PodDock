@@ -7,7 +7,7 @@ name: Release
 # Action versions verified on 2026-08-31: gh-release@v3 / login@v4 / metadata@v6 /
 # buildx@v4 / build-push@v7.
 #
-# Required secrets:
+# Required secrets (how to obtain each one: docs/DEVELOPMENT.md):
 #   APPLE_CERTIFICATE_BASE64    — Developer ID Application certificate (.p12, base64)
 #   APPLE_CERTIFICATE_PASSWORD  — password of that .p12
 #   KEYCHAIN_PASSWORD           — password for the ephemeral CI keychain
@@ -130,7 +130,9 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable=${{ !github.event.release.prerelease }}
+            # `latest` only on stable tags — prereleases carry a hyphen (v1.0.0-rc1);
+            # github.event.release is empty on tag-push triggers
+            type=raw,value=latest,enable=${{ !contains(github.ref, '-') }}
 
       - name: Build and push
         uses: docker/build-push-action@v7
