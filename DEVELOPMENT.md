@@ -49,6 +49,31 @@ Add them under **Settings → Secrets and variables → Actions**:
 
 The team ID is parsed automatically from the imported certificate; no separate secret for it. No Apple ID or app-specific password is needed — signing alone does not involve them.
 
+### Obtaining the certificate (Keychain Access)
+
+An **Apple Development** certificate is created automatically the first time you build and run a project in Xcode with your Apple ID signed in (Xcode → Settings → Accounts). A free Apple ID is enough — no paid Apple Developer Program membership. If you have ever run an app from Xcode on this Mac, the certificate is most likely already in your keychain.
+
+Verify and export it:
+
+1. Open **Keychain Access** → **login** keychain → **My Certificates** category.
+2. Find `Apple Development: <your-email> (TEAMID)` — e.g. `Apple Development: user@example.com (9TYSNKGT39)`.
+   - It **must sit under "My Certificates" with a disclosure triangle revealing a private key underneath**. If it only appears under "Certificates" without a key, the private key lives on another Mac (or is lost) — see below.
+   - Check the expiry date in the cert details; anything in the future is fine.
+3. Select **both** the certificate **and** its private key (⌘-click), then **File → Export Items**.
+   - Format: **Personal Information Exchange (.p12)**
+   - Set a password — this becomes `APPLE_CERTIFICATE_PASSWORD`.
+4. Encode it:
+
+```bash
+base64 -i ~/Desktop/certificate.p12 | pbcopy   # macOS clipboard; paste into APPLE_CERTIFICATE_BASE64
+```
+
+The result is one long single line — make sure no line breaks got pasted in.
+
+**No usable certificate in Keychain?** Have Xcode create one: Xcode → Settings → Accounts → select your Apple ID → **Manage Certificates…** → **+** → **Apple Development**. This revokes and re-issues on the current Mac, so export the fresh cert afterwards and update the secret.
+
+**Renewal:** these certificates are valid for roughly a year. Xcode renews them transparently when they expire — when that happens, re-export the new `.p12` and update `APPLE_CERTIFICATE_BASE64` / `APPLE_CERTIFICATE_PASSWORD`.
+
 ### Cutting a release
 
 1. Bump `MARKETING_VERSION` in `PodDock.xcodeproj/project.pbxproj` (both Debug and Release rows) to match the tag.
