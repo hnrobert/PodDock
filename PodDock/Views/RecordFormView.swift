@@ -1,9 +1,9 @@
 import SwiftUI
 import DNSPodKit
 
-/// 记录表单:类型/线路下拉(recordOptions 缓存拉取)、默认值、客户端预校验。
+/// Record form: type/line pickers (cached recordOptions), defaults, client-side pre-validation.
 struct RecordFormView: View {
-  /// 表单模式(.create 新建 / .edit 编辑回填)
+  /// Form mode (.create new / .edit pre-filled)
   enum FormMode {
     case create(domain: DNSDomain)
     case edit(domain: DNSDomain, record: DNSRecord)
@@ -159,7 +159,7 @@ struct RecordFormView: View {
     defer { isLoadingOptions = false }
     do {
       options = try await client.recordOptions(for: domain)
-      // 当前值不在选项里时(如旧线路),回落到第一项避免 Picker 丢值
+      // When the current value is absent from options (e.g. an old line), fall back to the first so the Picker doesn't drop it
       if let options, !options.types.contains(recordType) {
         recordType = options.types.first ?? recordType
       }
@@ -197,7 +197,7 @@ struct RecordFormView: View {
         dismiss()
       } catch let error as DNSPodError {
         if case .remarkFailed = error {
-          // 部分失败:主操作已成功,照常关闭并刷新
+          // Partial failure: the main op succeeded — close and refresh anyway
           onSaved()
           dismiss()
           return
@@ -209,13 +209,13 @@ struct RecordFormView: View {
     }
   }
 
-  /// 简单 IPv4 预校验(参考实现完全没有校验,全靠服务端报错)
+  /// Simple IPv4 pre-check (the reference validated nothing and leaned on server errors)
   static func isIPv4(_ text: String) -> Bool {
     let parts = text.split(separator: ".")
     guard parts.count == 4 else { return false }
     return parts.allSatisfy { part in
       guard let number = Int(part), (0...255).contains(number) else { return false }
-      return part.count == String(number).count  // 拒绝前导零
+      return part.count == String(number).count  // reject leading zeros
     }
   }
 }

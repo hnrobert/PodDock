@@ -1,9 +1,9 @@
 import Foundation
 
-// MARK: - 传统 API 响应 DTO
+// MARK: - Legacy API response DTOs
 //
-// 形态依据参考实现 app.py 与 docs.dnspod.cn 示例;数字字段一律 Flex 容错,
-// 真实 fixture 于 M1 用真 token 抓取补全(Fixtures/*.json)。
+// Shapes from the reference app.py and docs.dnspod.cn samples; numeric fields all Flex-tolerant,
+// Real fixtures to be captured with a live token in M1 (Fixtures/*.json).
 
 struct LegacyStatusDTO: Codable {
   let code: FlexInt
@@ -80,8 +80,8 @@ struct RecordLinesResponse: Codable {
   let lines: [String]?
 }
 
-/// Record.List 与 Record.Info 的字段名不同(`type`/`line` vs `record_type`/`record_line`),
-/// 两种形态都解,统一归一为 DNSRecord。
+/// Record.List and Record.Info use different keys (`type`/`line` vs `record_type`/`record_line`);
+/// Decodes both shapes into one DNSRecord.
 struct LegacyRecordDTO: Codable {
   let id: FlexString
   let name: String?

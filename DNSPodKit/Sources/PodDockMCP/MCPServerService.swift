@@ -6,7 +6,7 @@ import ServiceLifecycle
 import MCP
 import DNSPodKit
 
-/// MCP 会话认证错误(区别于 ToolDispatch 的参数错误)
+/// MCP session-auth errors (distinct from ToolDispatch argument errors)
 enum MCPAuthError: Error, LocalizedError {
   case notAuthenticated
   case missingParameter(String)
@@ -19,10 +19,10 @@ enum MCPAuthError: Error, LocalizedError {
   }
 }
 
-// MARK: - 会话凭据仓
+// MARK: - Session credential store
 
-/// dnspod_login 验证通过后,把 DNSPodClient 绑定到 `Mcp-Session-Id` 会话;
-/// 后续同会话的工具调用全部使用这份 client。登出/断开即清除。
+/// After dnspod_login succeeds, binds the DNSPodClient to the `Mcp-Session-Id` session;
+/// later calls in the session reuse this client. Logout/disconnect clears it.
 actor MCPSessionStore {
   struct SessionEntry: Sendable {
     let client: DNSPodClient
@@ -47,10 +47,10 @@ actor MCPSessionStore {
   var sessionCount: Int { entries.count }
 }
 
-// MARK: - 连接池
+// MARK: - Connection pool
 
-/// `StatefulHTTPServerTransport` 是单会话 transport(一个 transport 一个 Mcp-Session-Id),
-/// 多客户端并发访问必须每会话一套 transport + Server,按客户端回传的会话头分发。
+/// `StatefulHTTPServerTransport` is single-session (one transport = one Mcp-Session-Id),
+/// Concurrent clients need one transport + Server each, dispatched by the returned session header.
 actor MCPConnectionPool {
   struct Connection: Sendable {
     let transport: StatefulHTTPServerTransport
@@ -69,7 +69,7 @@ actor MCPConnectionPool {
     return (transport, server)
   }
 
-  /// initialize 响应回来后(响应头带会话号),把连接登记到该会话号下
+  /// After the initialize reply (headers carry the session id), register the connection under it
   func register(sessionID: String, transport: StatefulHTTPServerTransport, server: Server) {
     connections[sessionID] = Connection(transport: transport, server: server, lastUsed: Date())
   }
@@ -87,7 +87,7 @@ actor MCPConnectionPool {
     }
   }
 
-  /// 清理空闲连接(客户端异常断开、未发 DELETE 的情况)
+  /// Drop idle connections (client vanished without DELETE)
   func sweep(idleThreshold: TimeInterval) async -> Int {
     let cutoff = Date().addingTimeInterval(-idleThreshold)
     let stale = connections.filter { $0.value.lastUsed < cutoff }
@@ -99,16 +99,16 @@ actor MCPConnectionPool {
   }
 }
 
-// MARK: - 服务
+// MARK: - Service
 
-/// 可嵌入的 MCP Streamable HTTP 服务(双宿主共用):
-/// - Linux 宿主:poddock-mcp executable 直接 `run()`
-/// - macOS App 内嵌:同一服务,注入共享当前账户的 client 工厂
+/// Embeddable MCP Streamable HTTP service (shared by both hosts):
+/// - Linux host: the poddock-mcp executable just calls `run()`
+/// - macOS app embed: same service, injected with a client factory sharing the current account
 ///
-/// 认证模型:**启动零凭据**;每个 MCP 客户端会话独立——客户端在会话内调用
-/// `dnspod_login`(整串 "ID,Token" 或分字段)→ 服务端用 LegacyClient 验证 →
-/// 凭据绑定该 Mcp-Session-Id → 其余工具按会话取 client。
-/// 可选 MCP_AUTH_TOKEN 做端点级 Bearer,与账户认证相互独立。
+/// Auth model: zero startup credentials; each MCP client session is independent — the client calls
+/// `dnspod_login` (pasted "ID,Token" or split fields) → server validates via LegacyClient →
+/// credentials bind to that Mcp-Session-Id → other tools fetch the client by session.
+/// Optional MCP_AUTH_TOKEN endpoint bearer, independent of account auth.
 public final class MCPServerService: Sendable {
   public let configuration: MCPServerConfiguration
   private let credentialStore = MCPSessionStore()
@@ -116,8 +116,8 @@ public final class MCPServerService: Sendable {
   private let makeClient: @Sendable (_ tokenID: String, _ tokenKey: String) -> DNSPodClient
 
   /// - Parameters:
-  ///   - makeClient: 认证通过后构造 DNSPod 客户端的工厂(默认 LegacyClient;
-  ///     测试可注入 stub;App 内嵌宿主可注入共享当前账户的实现)
+  ///   - makeClient: factory building the DNSPod client after login (default LegacyClient;
+  ///     tests can inject a stub; the embedded host injects one sharing the current account)
   public init(
     configuration: MCPServerConfiguration = MCPServerConfiguration(),
     makeClient: @escaping @Sendable (String, String) -> DNSPodClient = {
@@ -128,9 +128,9 @@ public final class MCPServerService: Sendable {
     self.makeClient = makeClient
   }
 
-  // MARK: - 启动
+  // MARK: - Startup
 
-  /// 内嵌宿主句柄:run 阻塞服务,stop 触发优雅停机(macOS App 内嵌用)
+  /// Embedded-host handle: run() serves until stopped, stop() triggers graceful shutdown (macOS app embed)
   public struct HostHandle: Sendable {
     let group: ServiceGroup
 
@@ -143,9 +143,9 @@ public final class MCPServerService: Sendable {
     }
   }
 
-  /// 组装 Hummingbird 应用并阻塞服务(Linux 宿主用;App 内嵌宿主用 startHost)
+  /// Assemble the Hummingbird app and serve (Linux host; embedded host uses startHost)
   public func run() async throws {
-    // 空闲连接回收(每小时一次,1 小时未用即清)
+    // Idle sweep (hourly; connections unused for 1h get dropped)
     let pool = self.pool
     Task.detached {
       while !Task.isCancelled {
@@ -157,7 +157,7 @@ public final class MCPServerService: Sendable {
     try await makeApplication().runService()
   }
 
-  /// 组装应用(不启动);内嵌宿主拿 ServiceGroup 自行 run/stop
+  /// Assemble without starting; the embedded host drives the ServiceGroup itself
   public func startHost() async throws -> HostHandle {
     HostHandle(group: ServiceGroup(services: [makeApplication()]))
   }
@@ -182,7 +182,7 @@ public final class MCPServerService: Sendable {
     )
   }
 
-  // MARK: - 请求处理
+  // MARK: - Request handling
 
   private func handle(request: Request, hasBody: Bool, closeAfter: Bool = false) async throws -> Response {
     var headers: [String: String] = [:]
@@ -190,7 +190,7 @@ public final class MCPServerService: Sendable {
       headers[String(describing: field.name)] = field.value
     }
 
-    // 端点级 Bearer(可选;与 dnspod_login 的账户认证相互独立)
+    // Endpoint bearer (optional; independent of dnspod_login account auth)
     if let required = configuration.bearerToken {
       let provided = headers.first { $0.key.lowercased() == "authorization" }?.value
       guard provided == "Bearer \(required)" else {
@@ -205,7 +205,7 @@ public final class MCPServerService: Sendable {
     if let sessionID, let connection = await pool.connection(for: sessionID) {
       transport = connection.transport
     } else {
-      // 新客户端:建一套专属 transport + Server,initialize 响应后再按其会话号登记
+      // New client: build a dedicated transport + Server; register under its session id once initialize replies
       let connection = await pool.makeConnection { transport in
         await self.makeServer(transport: transport)
       }
@@ -245,7 +245,7 @@ public final class MCPServerService: Sendable {
     return Self.hummingbirdResponse(from: mcpResponse)
   }
 
-  // MARK: - Server 组装
+  // MARK: - Server assembly
 
   private func makeServer(transport: StatefulHTTPServerTransport) async -> Server {
     let server = Server(
@@ -263,7 +263,7 @@ public final class MCPServerService: Sendable {
     let sessions = self.credentialStore
     let makeClient = self.makeClient
 
-    // 工具目录(MCPToolCatalog 单一契约源 + 认证工具)
+    // Tool catalog (MCPToolCatalog single source + auth tools)
     await server.withMethodHandler(ListTools.self) { _ in
       let catalogTools = MCPToolCatalog.all.map { tool in
         Tool(
@@ -305,7 +305,7 @@ public final class MCPServerService: Sendable {
       return ListTools.Result(tools: authTools + catalogTools)
     }
 
-    // 工具调用
+    // Tool calls
     await server.withMethodHandler(CallTool.self) { params in
       do {
         return try await Self.handleToolCall(
@@ -320,7 +320,7 @@ public final class MCPServerService: Sendable {
     }
   }
 
-  /// 单次工具调用:认证工具走会话仓,业务工具要求会话已认证
+  /// One tool call: auth tools go through the session store; business tools require an authenticated session
   static func handleToolCall(
     params: CallTool.Parameters,
     sessions: MCPSessionStore,
@@ -350,7 +350,7 @@ public final class MCPServerService: Sendable {
       }
 
       let client = makeClient(parsed.id, parsed.token)
-      let domains = try await client.listDomains()  // error_on_empty=no:列表成功即凭据有效
+      let domains = try await client.listDomains()  // error_on_empty=no: list success means valid credentials
       let sessionID = try requireSessionID()
       let label = Account.defaultLabel(tokenID: parsed.id)
       await sessions.login(sessionID: sessionID, client: client, label: label)
@@ -376,13 +376,13 @@ public final class MCPServerService: Sendable {
     }
   }
 
-  // MARK: - 响应映射
+  // MARK: - Response mapping
 
-  /// MCP HTTPResponse → Hummingbird Response(含 SSE 流式透传)
+  /// MCP HTTPResponse → Hummingbird Response (SSE pass-through included)
   nonisolated static func hummingbirdResponse(from mcpResponse: MCP.HTTPResponse) -> Response {
     var fields = HTTPFields()
     for (name, value) in mcpResponse.headers {
-      // MCP 的响应头都是标准名;非法名(理论不出现)跳过
+      // MCP response headers are all standard names; skip invalid ones (theoretical)
       if let fieldName = HTTPField.Name(name) {
         fields.append(HTTPField(name: fieldName, value: value))
       }
@@ -395,7 +395,7 @@ public final class MCPServerService: Sendable {
         status: status, headers: fields,
         body: .init(byteBuffer: ByteBuffer(bytes: data)))
     case .stream(let sseStream, _):
-      // SSE:把 async 流写进响应体(POST 响应与 GET 长连接共用)
+      // SSE: pipe the async stream into the response body (POST replies and GET long-poll alike)
       return Response(
         status: status, headers: fields,
         body: .init(contentLength: nil) { writer in

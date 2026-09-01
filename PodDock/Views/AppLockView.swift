@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// 应用锁遮罩:Face ID / Touch ID / 密码解锁
+/// App-lock overlay: Face ID / Touch ID / password unlock
 struct AppLockView: View {
   @Environment(AppEnvironment.self) private var environment
   @State private var isAuthenticating = false
@@ -34,7 +34,7 @@ struct AppLockView: View {
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .interactiveDismissDisabled()
     .task {
-      // 冷启动进入时自动弹一次生物识别
+      // Prompt biometric auth once when shown at cold start
       guard !isAuthenticating else { return }
       isAuthenticating = true
       await environment.lock.unlock()

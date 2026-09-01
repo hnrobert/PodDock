@@ -1,7 +1,7 @@
 import Foundation
 import DNSPodKit
 
-// MARK: - LLM 抽象(协议无关的消息/工具/响应形状)
+// MARK: - LLM abstraction (protocol-agnostic message/tool/response shapes)
 
 enum LLMProviderKind: String, CaseIterable, Identifiable, Sendable {
   case anthropic
@@ -17,7 +17,7 @@ enum LLMProviderKind: String, CaseIterable, Identifiable, Sendable {
   }
 }
 
-/// 工具定义(MCPToolCatalog 的 LLM 侧形状;两种协议共用)
+/// Tool definition (LLM-side shape of MCPToolCatalog; shared by both protocols)
 struct LLMToolDefinition: Sendable {
   let name: String
   let description: String
@@ -34,7 +34,7 @@ struct LLMToolDefinition: Sendable {
   }
 }
 
-/// 消息内容块
+/// Message content blocks
 enum LLMContentBlock: Sendable {
   case text(String)
   case toolUse(id: String, name: String, arguments: [String: JSONValue])
@@ -86,7 +86,7 @@ enum LLMError: Error, LocalizedError {
   }
 }
 
-// MARK: - 提供商协议
+// MARK: - Provider protocol
 
 protocol LLMProviding: Sendable {
   func complete(system: String, messages: [LLMMessage], tools: [LLMToolDefinition]) async throws -> LLMResponse

@@ -2,10 +2,10 @@ import Foundation
 
 // MARK: - FlexDecodable
 //
-// DNSPod 的 JSON 把数字当字符串返回(`enabled`/`mx`/`ttl`/`records`/各类 id),
-// 偶尔又是真数字。以下容器类型对两种形态都容错,这是 Kit 存在的核心原因之一。
+// DNSPod JSON returns numbers as strings (`enabled`/`mx`/`ttl`/`records`/ids),
+// sometimes real numbers. These containers tolerate both shapes — a core reason the Kit exists.
 
-/// Int 或数字字符串 → Int
+/// Int or numeric string → Int
 public struct FlexInt: Codable, Sendable, Hashable {
   public let value: Int
 
@@ -34,7 +34,7 @@ public struct FlexInt: Codable, Sendable, Hashable {
   }
 }
 
-/// `"0"`/`"1"`/`0`/`1`/`"enable"` 等 → Bool
+/// "0"/"1"/0/1/"enable" etc. → Bool
 public struct FlexBool: Codable, Sendable, Hashable {
   public let value: Bool
 
@@ -68,7 +68,7 @@ public struct FlexBool: Codable, Sendable, Hashable {
   }
 }
 
-/// Int/Double/String → String(id 类字段防脆裂)
+/// Int/Double/String → String (keeps id fields resilient)
 public struct FlexString: Codable, Sendable, Hashable {
   public let value: String
 

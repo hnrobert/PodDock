@@ -1,7 +1,7 @@
 import SwiftUI
 import DNSPodKit
 
-/// 记录列表:搜索/类型筛选/排序/多选批量(顺序+节流)/备注快编/启停/删除(确认框)。
+/// Record list: search/type filter/sort/multi-select batch (sequential + throttled)/quick remark/toggle/remove (confirmed).
 struct RecordListView: View {
   @Environment(AppEnvironment.self) private var environment
   let domain: DNSDomain
@@ -60,7 +60,7 @@ struct RecordListView: View {
       .modifier(RecordAlertsLayer(model: model))
   }
 
-  /// 列表面板(List + overlay + 导航 + 工具栏 + 筛选条)——拆出来防表达式超时
+  /// List pane (List + overlay + nav + toolbar + filter bar) — split out to avoid type-check timeouts
   private var listPane: some View {
     List(selection: isSelecting ? $selection : .constant(Set<RecordID>())) {
       ForEach(model.filteredRecords) { record in
@@ -116,8 +116,8 @@ struct RecordListView: View {
 
   @ToolbarContentBuilder
   private var recordToolbar: some ToolbarContent {
-    // 工具栏必须完全静态:macOS 上动态增删 ToolbarItem / 工具栏内 Toggle
-    // 会在 NSToolbar 插入项时抛异常崩溃(crash 报告:_insertNewItemWithItemIdentifier)
+    // The toolbar must be fully static: dynamic ToolbarItems / a Toggle inside the toolbar
+    // crashes when NSToolbar inserts items (crash report: _insertNewItemWithItemIdentifier)
     ToolbarItem(placement: .primaryAction) {
       Button {
         isShowingCreate = true
@@ -152,7 +152,7 @@ struct RecordListView: View {
     }
   }
 
-  /// 类型筛选 + 排序条(批量操作按钮也放这里,避免动态工具栏项)
+  /// Type filter + sort bar (batch buttons live here too, keeping toolbar items static)
   private var filterBar: some View {
     HStack(spacing: 12) {
       Picker("Type", selection: Binding(
@@ -266,7 +266,7 @@ private struct RecordRowView: View {
   }
 }
 
-/// 删除确认(单条 + 批量)
+/// Removal confirmations (single + batch)
 private struct RecordDialogsLayer: ViewModifier {
   @Binding var pendingDelete: DNSRecord?
   @Binding var pendingBatchDelete: [DNSRecord]?
@@ -312,7 +312,7 @@ private struct RecordDialogsLayer: ViewModifier {
   }
 }
 
-/// 提示与错误 alert(绑定模型消息)
+/// Notice/error alerts bound to model messages
 @MainActor
 private struct RecordAlertsLayer: ViewModifier {
   let model: RecordListModel

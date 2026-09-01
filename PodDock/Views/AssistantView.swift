@@ -1,7 +1,7 @@
 import SwiftUI
 import DNSPodKit
 
-/// LLM 助手面板:对话式,自然语言直接操作解析;写操作经确认门。
+/// LLM assistant panel: conversational DNS edits in natural language; writes pass the confirmation gate.
 struct AssistantView: View {
   @Environment(AppEnvironment.self) private var environment
   @State private var draft = ""

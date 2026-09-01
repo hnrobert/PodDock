@@ -1,16 +1,16 @@
 import Foundation
 
-/// PodDockMCP 服务配置(双宿主共用)。
+/// PodDockMCP service configuration (shared by both hosts).
 ///
-/// **服务器启动零凭据**:DNSPod Token 不在启动时内置(不用 DNSPOD_TOKEN),
-/// 由 MCP 客户端在会话内调用 `dnspod_login` 工具认证,凭据绑定到该
-/// `Mcp-Session-Id` 会话,后续工具调用全部使用会话对应的 client。
+/// **Zero startup credentials**: no DNSPod token at boot (no DNSPOD_TOKEN),
+/// clients authenticate via the in-session `dnspod_login` tool; credentials bind to that
+/// session; later tool calls all use the client bound to it.
 public struct MCPServerConfiguration: Sendable {
-  /// 监听地址。Linux 部署默认 0.0.0.0;App 内嵌恒为 127.0.0.1
+  /// Listen address. Linux defaults to 0.0.0.0; the app embed is always 127.0.0.1
   public var host: String
   public var port: Int
-  /// 可选:端点级 Bearer 保护(Authorization: Bearer <token>),与 dnspod_login 的
-  /// 账户认证相互独立——前者保护 MCP 端点本身,后者绑定 DNSPod 凭据
+  /// Optional endpoint bearer (Authorization: Bearer <token>), independent of dnspod_login's
+  /// independent of account auth — the former guards the MCP endpoint, the latter binds DNSPod credentials
   public var bearerToken: String?
 
   public init(
@@ -23,9 +23,9 @@ public struct MCPServerConfiguration: Sendable {
     self.bearerToken = bearerToken
   }
 
-  /// 环境变量装配(Linux 宿主):
-  /// `PODDOCK_MCP_HOST`(默认 0.0.0.0)、`PODDOCK_MCP_PORT`(默认 28100)、`MCP_AUTH_TOKEN`(端点 Bearer)。
-  /// 注意:DNSPOD_TOKEN 已不再使用——认证走 MCP 会话内的 dnspod_login 工具。
+  /// Environment wiring (Linux host):
+  /// `PODDOCK_MCP_HOST` (default 0.0.0.0), `PODDOCK_MCP_PORT` (default 28100), `MCP_AUTH_TOKEN` (endpoint bearer).
+  /// Note: DNSPOD_TOKEN is no longer used — auth happens via dnspod_login inside the MCP session.
   public static func fromEnvironment(
     _ environment: [String: String] = ProcessInfo.processInfo.environment
   ) -> MCPServerConfiguration {

@@ -2,18 +2,18 @@ import Foundation
 import DNSPodKit
 import PodDockMCP
 
-// poddock-mcp —— Linux/服务器宿主。
+// poddock-mcp — Linux/server host.
 //
-// Streamable HTTP 服务,**启动零凭据**:DNSPod Token 不经环境变量内置,
-// 由 MCP 客户端在会话内调用 dnspod_login 工具认证,凭据绑定该会话。
+// Streamable HTTP with zero startup credentials: no DNSPod token baked in via env,
+// Clients authenticate via the in-session dnspod_login tool; credentials bind to that session.
 //
 //   swift run poddock-mcp
-//   可选:PODDOCK_MCP_HOST(默认 0.0.0.0)、PODDOCK_MCP_PORT(默认 28100)、
-//        MCP_AUTH_TOKEN(端点级 Bearer 保护,与 dnspod_login 相互独立)
+//   Optional: PODDOCK_MCP_HOST (default 0.0.0.0), PODDOCK_MCP_PORT (default 28100),
+//        MCP_AUTH_TOKEN (endpoint bearer, independent of dnspod_login)
 //
-// 客户端接入(Claude Code):
+// Client hookup (Claude Code):
 //   claude mcp add --transport http poddock http://<host>:<port>/mcp
-//   然后在会话里让模型调用 dnspod_login 提供你的 "ID,Token"。
+//   then ask the model to call dnspod_login with your "ID,Token".
 
 let configuration = MCPServerConfiguration.fromEnvironment()
 let service = MCPServerService(configuration: configuration)

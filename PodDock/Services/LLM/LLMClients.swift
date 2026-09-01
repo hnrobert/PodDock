@@ -1,7 +1,7 @@
 import Foundation
 import DNSPodKit
 
-// MARK: - Anthropic 原生 /v1/messages(Swift 无官方 SDK,原生 HTTP 实现)
+// MARK: - Anthropic native /v1/messages (no official Swift SDK; raw HTTP)
 
 struct AnthropicClient: LLMProviding {
   static let defaultBaseURL = "https://api.anthropic.com"
@@ -63,7 +63,7 @@ struct AnthropicClient: LLMProviding {
   }
 
   private func post(_ url: String, _ body: [String: Any]) async throws -> Data {
-    // SE-0461:非隔离 async 继承调用方 actor,LLM 往返必须离开主线程
+    // SE-0461: nonisolated async inherits the caller's actor; LLM round-trips must leave the main thread
     let request = HTTPRequest(
       url: URL(string: url)!,
       method: "POST",
@@ -112,7 +112,7 @@ struct AnthropicClient: LLMProviding {
   }
 }
 
-// MARK: - OpenAI 兼容 /chat/completions(自定义 base URL)
+// MARK: - OpenAI-compatible /chat/completions (custom base URL)
 
 struct OpenAICompatClient: LLMProviding {
   static let defaultBaseURL = "https://api.openai.com/v1"
@@ -196,7 +196,7 @@ struct OpenAICompatClient: LLMProviding {
     return response.body
   }
 
-  /// 一条 LLMMessage 可能展开为多条 OpenAI 消息(assistant 工具调用与 tool 结果是独立消息)
+  /// One LLMMessage may expand into several OpenAI messages (assistant tool_calls and tool results are separate messages)
   private static func encodeMessage(_ message: LLMMessage) -> [[String: Any]] {
     var result: [[String: Any]] = []
     var pendingToolCalls: [[String: Any]] = []
@@ -247,10 +247,10 @@ struct OpenAICompatClient: LLMProviding {
   }
 }
 
-// MARK: - 工厂
+// MARK: - Factory
 
 enum LLMClientFactory {
-  /// 按设置构造;未配置(无 key)返回 nil
+  /// Build from settings; nil when unconfigured (no key)
   static func make(kind: LLMProviderKind, apiKey: String?, model: String, baseURL: String) -> LLMProviding? {
     guard let apiKey, !apiKey.isEmpty else { return nil }
     let model = model.isEmpty ? nil : model

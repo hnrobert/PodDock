@@ -1,7 +1,7 @@
 import Foundation
 import LocalAuthentication
 
-/// 应用锁(Face ID / Touch ID / 密码,可选开关;LAContext)。
+/// App lock (Face ID / Touch ID / password, optional; LAContext).
 @MainActor
 @Observable
 final class AppLockController {
@@ -13,14 +13,14 @@ final class AppLockController {
     self.preferences = preferences
   }
 
-  /// 冷启动时按设置上锁
+  /// Lock at cold start when the setting is on
   func engageIfNeeded() {
     if preferences.appLockEnabled {
       isLocked = true
     }
   }
 
-  /// 关闭应用锁开关时立即解除锁定
+  /// Unlock immediately when the app-lock toggle turns off
   func clearLock() {
     isLocked = false
     unlockFailureMessage = nil

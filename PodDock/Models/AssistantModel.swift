@@ -2,8 +2,8 @@ import Foundation
 import DNSPodKit
 import Observation
 
-/// LLM 助手模型:自然语言 → LLM → MCP 标准工具调用 → 本地经 DNSPodClient 执行,
-/// 循环直至完成;破坏性工具必须经用户确认(UI 挂起等待)。
+/// LLM assistant model: natural language → LLM → MCP-standard tool calls → local DNSPodClient execution,
+/// Loops until done; destructive tools require user confirmation (the UI suspends waiting).
 @MainActor
 @Observable
 final class AssistantModel {
@@ -25,7 +25,7 @@ final class AssistantModel {
     static func == (lhs: Entry, rhs: Entry) -> Bool { lhs.id == rhs.id }
   }
 
-  /// 待确认的破坏性操作(确认门)
+  /// Destructive operation awaiting confirmation (the gate)
   struct PendingConfirmation: Identifiable, Equatable {
     let id = UUID()
     let toolName: String
@@ -39,7 +39,7 @@ final class AssistantModel {
   private var confirmationContinuation: CheckedContinuation<Bool, Never>?
   private let secretStore = SecretStore()
 
-  /// Mock 注入(XCUITest / Preview 按脚本回放)
+  /// Mock injection (XCUITest / scripted Preview replay)
   var providerOverride: (any LLMProviding)?
 
   func attach(environment: AppEnvironment) {
@@ -75,7 +75,7 @@ final class AssistantModel {
     let tools = LLMToolDefinition.catalog
     let system = Self.systemPrompt(accountLabel: environment.currentAccount?.label)
 
-    // 工具循环(上限 10 轮,防失控)
+    // Tool loop (capped at 10 rounds)
     for _ in 0..<10 {
       let response: LLMResponse
       do {
@@ -99,7 +99,7 @@ final class AssistantModel {
       }
       messages.append(LLMMessage(role: .assistant, blocks: assistantBlocks))
 
-      // 逐个执行工具调用
+      // Execute tool calls one by one
       var resultBlocks: [LLMContentBlock] = []
       for call in response.toolCalls {
         guard let tool = MCPToolCatalog.tool(named: call.name) else {
@@ -108,7 +108,7 @@ final class AssistantModel {
         }
         let summary = Self.argumentSummary(call)
 
-        // 确认门:破坏性操作必须用户批准(其余写操作也确认——LLM 只能"提议")
+        // Confirmation gate: destructive ops need user approval (all writes, actually — the LLM can only propose)
         if tool.isReadOnly == false {
           let approved = await requestConfirmation(
             toolName: call.name, summary: summary)
@@ -138,7 +138,7 @@ final class AssistantModel {
     transcript.append(.error(String(localized: "Tool loop limit reached")))
   }
 
-  // MARK: - 确认门
+  // MARK: - Confirmation gate
 
   private func requestConfirmation(toolName: String, summary: String) async -> Bool {
     await withCheckedContinuation { continuation in
@@ -153,7 +153,7 @@ final class AssistantModel {
     confirmationContinuation = nil
   }
 
-  // MARK: - 提示词
+  // MARK: - System prompt
 
   static func systemPrompt(accountLabel: String?) -> String {
     var prompt = """
@@ -171,7 +171,7 @@ final class AssistantModel {
     return prompt
   }
 
-  /// 工具调用的一句话摘要(确认框展示)
+  /// One-line argument summary for the confirmation dialog
   static func argumentSummary(_ call: LLMToolCall) -> String {
     let arguments = call.arguments
     let parts: [String]

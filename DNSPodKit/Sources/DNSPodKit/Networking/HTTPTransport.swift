@@ -3,10 +3,10 @@ import Foundation
   import FoundationNetworking
 #endif
 
-// MARK: - 传输层
+// MARK: - Transport
 //
-// 全 Kit 的测试支点:生产用 URLSessionTransport,测试/Preview 用 MockTransport,
-// LegacyClient 只依赖 HTTPTransport 协议。
+// The Kit's test pivot: URLSessionTransport in production, MockTransport in tests/previews,
+// LegacyClient depends only on the HTTPTransport protocol.
 
 public struct HTTPRequest: Sendable {
   public let url: URL
@@ -33,7 +33,7 @@ public struct HTTPResponse: Sendable {
     self.headers = headers
   }
 
-  /// 测试便利:以 JSON 字符串构造 200 响应
+  /// Test convenience: 200 response from a JSON string
   public static func ok(_ json: String) -> HTTPResponse {
     HTTPResponse(statusCode: 200, body: Data(json.utf8))
   }
@@ -43,9 +43,9 @@ public protocol HTTPTransport: Sendable {
   func send(_ request: HTTPRequest) async throws -> HTTPResponse
 }
 
-/// 生产传输。凭据会话必须不可落盘:ephemeral + 忽略本地缓存,
-/// token 与记录数据不进 URLCache(DNSPod 的 t 开头回传 cookie 由
-/// ephemeral session 的私有 cookie store 自动维持,替代旧仓库的手动逻辑)。
+/// Production transport. Credential sessions must never touch disk: ephemeral + ignore local cache,
+/// tokens and record data stay out of URLCache (DNSPod's t-prefixed cookies are kept by
+/// the ephemeral session's private cookie store maintains them — replacing the old repo's manual logic).
 public final class URLSessionTransport: HTTPTransport {
   private let session: URLSession
 

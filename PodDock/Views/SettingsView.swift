@@ -4,7 +4,7 @@ import SwiftUI
 #endif
 import DNSPodKit
 
-/// 设置(macOS Settings scene;iOS 于 M4 挂到导航):账户管理/应用锁/DoH 默认/关于。
+/// Settings (macOS Settings scene; iOS lands in M4): accounts/app lock/DoH default/about.
 struct SettingsView: View {
   @Environment(AppEnvironment.self) private var environment
   @State private var isShowingAdd = false
@@ -164,7 +164,7 @@ struct SettingsView: View {
   }
 }
 
-/// 设置内嵌的添加账户(复用 AddAccountView,成功后留在设置页)
+/// Add-account embedded in settings (reuses AddAccountView; stays on success)
 private struct AddAccountSheetEmbedded: View {
   @Environment(\.dismiss) private var dismiss
 
@@ -174,7 +174,7 @@ private struct AddAccountSheetEmbedded: View {
   }
 }
 
-/// LLM API Key 行(Keychain 存取)
+/// LLM API key row (Keychain-backed)
 private struct LLMKeyField: View {
   let kind: LLMProviderKind
   @State private var key = ""

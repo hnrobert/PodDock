@@ -11,7 +11,7 @@ let package = Package(
     .executable(name: "poddock-capture", targets: ["PodDockCapture"]),
   ],
   dependencies: [
-    // MCP 官方 Swift SDK,尚未 1.0,API 会动 → 钉精确版本,升级时只动 PodDockMCP 层
+    // Official MCP Swift SDK, pre-1.0 with a moving API → pin exact; upgrades only touch the PodDockMCP layer
     .package(url: "https://github.com/modelcontextprotocol/swift-sdk", exact: "0.12.1"),
     .package(url: "https://github.com/hummingbird-project/hummingbird", exact: "2.26.0"),
     .package(

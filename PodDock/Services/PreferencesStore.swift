@@ -2,8 +2,8 @@ import Foundation
 import DNSPodKit
 import Observation
 
-/// 偏好存储(UserDefaults;非机密,凭据只在 Keychain)。
-/// 隐私清单已声明 UserDefaults 的 C56D.1 使用理由。
+/// Preferences store (UserDefaults; nothing secret — credentials live only in Keychain).
+/// The privacy manifest already declares the C56D.1 UserDefaults reason.
 @MainActor
 @Observable
 final class PreferencesStore {

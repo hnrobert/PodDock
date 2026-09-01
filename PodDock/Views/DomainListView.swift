@@ -1,7 +1,7 @@
 import SwiftUI
 import DNSPodKit
 
-/// 侧栏域名列表:搜索/启停/添加/删除(确认框);spam/lock 不可切换。
+/// Sidebar domain list: search/toggle/add/remove (with confirmation); spam/lock can't toggle.
 struct DomainListView: View {
   @Environment(AppEnvironment.self) private var environment
   @Binding var selection: DomainID?
@@ -12,8 +12,8 @@ struct DomainListView: View {
   private var model: DomainListModel { environment.domains }
 
   var body: some View {
-    // 注意:侧栏不能用 .searchable——同一窗口工具栏只允许一个搜索项,
-    // 与详情的 .searchable 并存会在 NSToolbar 插入时因标识符冲突抛异常崩溃
+    // Note: the sidebar must not use .searchable — a window toolbar allows a single search item;
+    // alongside the detail's .searchable it crashes NSToolbar insertion on an identifier conflict
     List(selection: $selection) {
       Section {
         ForEach(model.filteredDomains) { domain in
@@ -125,7 +125,7 @@ private struct DomainRowView: View {
       }
       Spacer()
       StatusBadge(state: domain.state)
-      // 行内开关(spam/lock/unknown 禁用)
+      // Inline toggle (disabled for spam/lock/unknown)
       Toggle("", isOn: Binding(
         get: { domain.state == .enable },
         set: { _ in onToggle() }
@@ -140,7 +140,7 @@ private struct DomainRowView: View {
   }
 }
 
-/// 添加域名
+/// Add domain
 struct AddDomainSheet: View {
   @Environment(AppEnvironment.self) private var environment
   @Environment(\.dismiss) private var dismiss

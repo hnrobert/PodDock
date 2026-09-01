@@ -1,9 +1,9 @@
 import Foundation
 
-// MARK: - 工具执行层
+// MARK: - Tool execution layer
 //
-// MCPToolCatalog 工具名 → DNSPodClient 调用 → 文本结果。
-// 服务三个宿主:PodDockMCP 服务器、App LLM 助手、未来的 CLI——单一实现,永不漂移。
+// MCPToolCatalog tool name → DNSPodClient call → text result.
+// Serves three hosts: the PodDockMCP server, the App LLM assistant, a future CLI — one impl, zero drift.
 
 public enum ToolDispatch {
   public enum DispatchError: Error, LocalizedError, Sendable {

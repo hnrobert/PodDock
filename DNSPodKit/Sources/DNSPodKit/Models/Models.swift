@@ -1,8 +1,8 @@
 import Foundation
 
-// MARK: - 强类型 ID
+// MARK: - Strongly-typed IDs
 
-/// 域名 ID。DNSPod 把数字当字符串返回,统一以 String 承载,防 Int 溢出与解码脆裂。
+/// Domain ID. DNSPod returns numbers as strings; String avoids Int overflow and brittle decoding.
 public struct DomainID: Hashable, Sendable, Codable, CustomStringConvertible {
   public let rawValue: String
   public init(rawValue: String) { self.rawValue = rawValue }
@@ -10,7 +10,7 @@ public struct DomainID: Hashable, Sendable, Codable, CustomStringConvertible {
   public var description: String { rawValue }
 }
 
-/// 记录 ID。
+/// Record ID.
 public struct RecordID: Hashable, Sendable, Codable, CustomStringConvertible {
   public let rawValue: String
   public init(rawValue: String) { self.rawValue = rawValue }
@@ -18,15 +18,15 @@ public struct RecordID: Hashable, Sendable, Codable, CustomStringConvertible {
   public var description: String { rawValue }
 }
 
-// MARK: - 状态
+// MARK: - Status
 
-/// 启停切换的目标状态(线格式 enable/disable)。
+/// Toggle target (wire values enable/disable).
 public enum ToggleStatus: String, Sendable {
   case enable
   case disable
 }
 
-/// 域名展示状态(线格式 enable/pause/spam/lock;spam/lock 不可切换)。
+/// Domain display state (wire: enable/pause/spam/lock; spam/lock not toggleable).
 public enum DomainState: String, Sendable {
   case enable
   case pause
@@ -34,22 +34,22 @@ public enum DomainState: String, Sendable {
   case lock
   case unknown
 
-  /// 未知字符串容错解析(参考实现 `grade_list[domain['grade']]` 会直接 KeyError,这里必须不崩)
+  /// Tolerant parse of unknown strings (the reference `grade_list[...]` KeyErrors here — we must not crash)
   public static func parse(_ raw: String) -> DomainState {
     DomainState(rawValue: raw) ?? .unknown
   }
 }
 
-// MARK: - 域名
+// MARK: - Domains
 
 public struct DNSDomain: Hashable, Sendable, Identifiable {
   public let id: DomainID
   public let name: String
-  /// 套餐等级原始字符串(如 DP_Free);未知值原样保留,App 层容错展示
+  /// Raw plan grade (e.g. DP_Free); unknown values pass through for tolerant display
   public let grade: String
   public let state: DomainState
   public let recordCount: Int
-  /// 服务端返回的原始时间串(非 ISO8601,展示层原样或自行格式化)
+  /// Raw server timestamp (not ISO8601; display verbatim or format at the view layer)
   public let updatedOn: String
 
   public init(
@@ -68,7 +68,7 @@ public struct DNSDomain: Hashable, Sendable, Identifiable {
   public func hash(into hasher: inout Hasher) { hasher.combine(id) }
 }
 
-/// 记录列表响应里附带的域名摘要——`grade` 是表单元数据的权威来源。
+/// Domain summary riding on the record list — `grade` is the authoritative form-metadata source.
 public struct DomainSummary: Hashable, Sendable {
   public let id: DomainID
   public let name: String
@@ -81,11 +81,11 @@ public struct DomainSummary: Hashable, Sendable {
   }
 }
 
-// MARK: - 记录
+// MARK: - Records
 
 public struct DNSRecord: Hashable, Sendable, Identifiable {
   public let id: RecordID
-  /// 主机记录,`@` 表示根域
+  /// Host record; `@` means the zone apex
   public let name: String
   public let type: String
   public let line: String
@@ -114,7 +114,7 @@ public struct DNSRecord: Hashable, Sendable, Identifiable {
   public func hash(into hasher: inout Hasher) { hasher.combine(id) }
 }
 
-/// 记录草稿(表单层)。默认值在此补齐:`@` / MX=10 / TTL=600,与参考实现一致。
+/// Record draft (form layer). Defaults filled here: `@` / MX=10 / TTL=600, matching the reference.
 public struct RecordDraft: Hashable, Sendable {
   public var subDomain: String
   public var recordType: String
@@ -137,18 +137,18 @@ public struct RecordDraft: Hashable, Sendable {
     self.recordType = recordType
     self.recordLine = recordLine
     self.value = value
-    // MX 空填 10、TTL 空填 600(仅当调用方未显式给值;与参考实现一致)
+    // MX defaults to 10, TTL to 600 (only when the caller omits them; matches the reference app)
     self.mx = mx ?? 10
     self.ttl = ttl ?? 600
     self.remark = remark
   }
 }
 
-/// 记录列表页——首日就按分页建模,TC3 强分页接入时不改调用方。
+/// Record list page — paged from day one so TC3 pagination drops in without caller changes.
 public struct RecordListPage: Sendable {
   public let records: [DNSRecord]
   public let domain: DomainSummary
-  /// Legacy 一次拉全量,恒为 false;分页实现填真实值
+  /// Legacy fetches everything at once, always false; paged impls fill the real value
   public let hasMore: Bool
 
   public init(records: [DNSRecord], domain: DomainSummary, hasMore: Bool = false) {
@@ -158,7 +158,7 @@ public struct RecordListPage: Sendable {
   }
 }
 
-/// 记录表单元数据:可选类型 + 可用线路。
+/// Form metadata: available types + lines.
 public struct RecordOptions: Hashable, Sendable {
   public let types: [String]
   public let lines: [String]

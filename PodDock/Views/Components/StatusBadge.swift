@@ -1,7 +1,7 @@
 import SwiftUI
 import DNSPodKit
 
-/// 域名状态徽章(品牌绿点缀:启用态用强调色)
+/// Domain state badge (brand-green accent on the enabled state)
 struct StatusBadge: View {
   let state: DomainState
 
@@ -35,7 +35,7 @@ struct StatusBadge: View {
   }
 }
 
-/// 记录启停小圆点
+/// Record enable/pause dot
 struct RecordStateDot: View {
   let isEnabled: Bool
 

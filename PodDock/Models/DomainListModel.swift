@@ -2,7 +2,7 @@ import Foundation
 import DNSPodKit
 import Observation
 
-/// 域名列表模型:加载/搜索/启停/增删,错误就地呈现。
+/// Domain list model: load/search/toggle/add/remove with inline errors.
 @MainActor
 @Observable
 final class DomainListModel {
@@ -54,7 +54,7 @@ final class DomainListModel {
 
   func toggle(_ domain: DNSDomain) async {
     guard let client = environment?.client else { return }
-    // pause → enable;enable → disable。spam/lock 不可切换(由视图层禁用)
+    // pause → enable; enable → disable. spam/lock cannot toggle (the view disables them)
     let target: ToggleStatus = domain.state == .enable ? .disable : .enable
     do {
       try await client.setDomainStatus(id: domain.id, to: target)

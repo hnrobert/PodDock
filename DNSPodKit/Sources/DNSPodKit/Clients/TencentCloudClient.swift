@@ -1,10 +1,10 @@
 import Foundation
 
-/// 腾讯云 API 3.0 实现(dnspod.tencentcloudapi.com + TC3-HMAC-SHA256 签名)。
+/// Tencent Cloud API 3.0 impl (dnspod.tencentcloudapi.com + TC3-HMAC-SHA256).
 ///
-/// M5 才升级为最小实现(先做 validateCredentials 验证协议抽象成立);
-/// 占位期全部操作抛 `notImplemented`。Capabilities 预告行为差异:
-/// Modify 内联 Remark / 服务端批量 / 强分页。
+/// Upgraded to a minimal impl in M5 (validateCredentials first, proving the abstraction);
+/// Placeholder: everything throws `notImplemented`. Capabilities preview the differences:
+/// inline remark on modify / server batch / strict pagination.
 public struct TencentCloudClient: DNSPodClient {
   public var capabilities: Set<DNSPodCapability> {
     [.inlineRemark, .batchStatus, .pagination]

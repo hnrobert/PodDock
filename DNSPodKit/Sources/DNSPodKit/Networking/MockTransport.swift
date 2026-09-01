@@ -1,7 +1,7 @@
 import Foundation
 
-/// 确定性 mock 传输:按序回放预置结果并记录全部请求。
-/// 服务 DNSPodKit 单测与 App 的 SwiftUI Preview / XCUITest。
+/// Deterministic mock transport: replays queued results in order and records every request.
+/// Serves DNSPodKit unit tests and the app's SwiftUI previews / XCUITests.
 public actor MockTransport: HTTPTransport {
   private var queue: [Result<HTTPResponse, Error>] = []
   public private(set) var requests: [HTTPRequest] = []

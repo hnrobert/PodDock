@@ -2,15 +2,15 @@ import Testing
 import Foundation
 @testable import DNSPodKit
 
-@Suite("MCP 工具目录(单一契约源)")
+@Suite("MCP tool catalog (single source of truth)")
 struct MCPToolCatalogTests {
-  @Test("12 件工具,名称唯一")
+  @Test("12 tools with unique names")
   func catalogShape() {
     #expect(MCPToolCatalog.all.count == 12)
     #expect(Set(MCPToolCatalog.all.map(\.name)).count == MCPToolCatalog.all.count)
   }
 
-  @Test("每件工具的 schema 都是 object 且 required ⊆ properties")
+  @Test("every schema is an object with required ⊆ properties")
   func schemaWellFormed() throws {
     for tool in MCPToolCatalog.all {
       guard case .object(let schema) = tool.inputSchema else {
@@ -33,7 +33,7 @@ struct MCPToolCatalogTests {
     }
   }
 
-  @Test("JSONValue 可被 JSONEncoder 序列化(LLM tool definition 直接用)")
+  @Test("JSONValue round-trips through JSONEncoder (usable as LLM tool definitions)")
   func jsonSerialization() throws {
     for tool in MCPToolCatalog.all {
       let data = try JSONEncoder().encode(tool.inputSchema)
@@ -42,7 +42,7 @@ struct MCPToolCatalogTests {
     }
   }
 
-  @Test("破坏性标注只落在删除类工具上")
+  @Test("destructive flags land only on removal tools")
   func destructiveFlags() {
     let destructive = Set(MCPToolCatalog.all.filter(\.isDestructive).map(\.name))
     #expect(destructive == ["remove_domain", "remove_record"])

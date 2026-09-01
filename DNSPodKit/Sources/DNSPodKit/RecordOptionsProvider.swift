@@ -1,10 +1,10 @@
 import Foundation
 
-/// 记录表单元数据缓存(传统 API 的行为知识,留在 Kit 内)。
+/// Form-metadata cache (legacy-API knowledge kept inside the Kit).
 ///
-/// `Record.Type` 按 grade 缓存、`Record.Line` 按 domain_id 缓存——
-/// 对齐参考实现的 session key 语义(`type_<grade>` / `line_<domain_id>`)。
-/// 进程级缓存,`reset()` 用于强制刷新。
+/// `Record.Type` cached by grade, `Record.Line` by domain_id —
+/// Mirrors the reference session-key semantics (`type_<grade>` / `line_<domain_id>`).
+/// Process-lifetime cache; `reset()` forces a refetch.
 public actor RecordOptionsProvider {
   private var typesByGrade: [String: [String]] = [:]
   private var linesByDomain: [String: [String]] = [:]

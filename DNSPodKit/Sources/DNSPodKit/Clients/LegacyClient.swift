@@ -1,10 +1,10 @@
 import Foundation
 
-/// 传统 API 实现(https://dnsapi.cn + login_token 表单 POST)。
+/// Legacy API impl (https://dnsapi.cn + login_token form POST).
 ///
-/// 公共参数由 `rawCall` 统一注入:`login_token`=`ID,Token`、`format=json`、
-/// `lang=cn`、`error_on_empty=no`;`status.code == 1` 为成功判定。
-/// 仅主账号可用,官方已标 legacy——由适配层对冲,业务行为差异全部收敛在本实现内。
+/// Common params injected by `rawCall`: `login_token`=`ID,Token`, `format=json`,
+/// `lang=cn`, `error_on_empty=no`; success is `status.code == 1`.
+/// Main accounts only, officially legacy — hedged by the adapter layer; behavioral quirks stay contained here.
 public struct LegacyClient: DNSPodClient {
   public var capabilities: Set<DNSPodCapability> { [] }
 
@@ -16,7 +16,7 @@ public struct LegacyClient: DNSPodClient {
   private let tokenKey: String
   private let baseURL: URL
   private let userAgent: String
-  /// 服务端错误消息语言(传统 API 支持 cn/en);App 按系统语言选择
+  /// Server error language (legacy API supports cn/en); the App picks by system language
   private let lang: String
   private let optionsProvider: RecordOptionsProvider
 
@@ -35,7 +35,7 @@ public struct LegacyClient: DNSPodClient {
     self.baseURL = baseURL
     self.userAgent = userAgent
     self.lang = lang
-    // type 按 grade 缓存、line 按 domain_id 缓存——传统 API 的行为知识,留在 Kit 内
+    // types cached by grade, lines by domain_id — legacy-API knowledge kept inside the Kit
     self.optionsProvider = optionsProvider ?? RecordOptionsProvider(
       fetchTypes: { [transport, baseURL, userAgent, tokenID, tokenKey, lang] grade in
         let response: RecordTypesResponse = try await LegacyClient.rawDecoded(
@@ -58,10 +58,10 @@ public struct LegacyClient: DNSPodClient {
     )
   }
 
-  // MARK: - 账户与域名
+  // MARK: - Accounts & domains
 
   public func validateCredentials() async throws {
-    // error_on_empty=no:空账户也返回 code 1,列表成功即凭据有效
+    // error_on_empty=no: empty accounts still return code 1, so a successful list means valid credentials
     _ = try await listDomains()
   }
 
@@ -75,7 +75,7 @@ public struct LegacyClient: DNSPodClient {
   }
 
   public func setDomainStatus(id: DomainID, to status: ToggleStatus) async throws {
-    // 参考实现发 enable/disable(官方文档写 enable|pause),首版照抄参考实现,M1 实测校正
+    // The reference sends enable/disable (docs say enable|pause); copy the reference for now, verify against a live domain in M1
     let _: StatusOnlyResponse = try await call(
       "Domain.Status", ["domain_id": id.rawValue, "status": status.rawValue])
   }
@@ -84,7 +84,7 @@ public struct LegacyClient: DNSPodClient {
     let _: StatusOnlyResponse = try await call("Domain.Remove", ["domain_id": id.rawValue])
   }
 
-  // MARK: - 记录
+  // MARK: - Records
 
   public func listRecords(domainID: DomainID) async throws -> RecordListPage {
     let response: RecordListResponse = try await call("Record.List", ["domain_id": domainID.rawValue])
@@ -127,7 +127,7 @@ public struct LegacyClient: DNSPodClient {
     }
     let recordID = RecordID(rawValue: rawID)
 
-    // 创建成功且填写了备注 → 补调 Remark(两次调用不原子,失败降级为部分失败)
+    // Created with a non-empty remark → follow up with Remark (two non-atomic calls; failure degrades to partial failure)
     if !draft.remark.isEmpty {
       do {
         try await setRecordRemark(id: recordID, domainID: domain.id, remark: draft.remark)
@@ -154,7 +154,7 @@ public struct LegacyClient: DNSPodClient {
         "ttl": String(draft.ttl),
       ])
 
-    // 参考实现:remark != oremark 才补调
+    // Reference app: only calls it when remark != oremark
     if draft.remark != original.remark {
       do {
         try await setRecordRemark(id: id, domainID: domain.id, remark: draft.remark)
@@ -185,10 +185,10 @@ public struct LegacyClient: DNSPodClient {
       ["domain_id": domainID.rawValue, "record_id": id.rawValue, "remark": remark])
   }
 
-  // MARK: - 底层调用
+  // MARK: - Low-level call
 
-  /// 调试 / fixture 抓取:信封校验后返回原始响应体。
-  /// 供 poddock-capture 抓真实响应进 Tests/DNSPodKitTests/Fixtures/。
+  /// Debug/fixture capture: returns the raw body after the envelope check.
+  /// Lets poddock-capture record real responses into Tests/DNSPodKitTests/Fixtures/.
   public func rawResponse(_ action: String, _ params: [String: String]) async throws -> Data {
     try await Self.raw(
       action: action, params: params,
@@ -203,10 +203,10 @@ public struct LegacyClient: DNSPodClient {
       baseURL: baseURL, userAgent: userAgent, lang: lang)
   }
 
-  /// 发起一次传统 API 调用并完成信封校验(静态方法便于 optionsProvider 闭包复用)。
+  /// One legacy-API call with envelope checking (static so optionsProvider closures reuse it).
   ///
-  /// 整体跑在并发池(Task.detached):SE-0461 下非隔离 async 函数会继承调用方的
-  /// actor——从 UI 调用时网络往返与 JSON 解码会被串行到主线程,慢网络即卡死。
+  /// Runs on the cooperative pool (Task.detached): under SE-0461 nonisolated async inherits the caller's
+  /// actor — called from the UI, network round-trips and JSON decoding serialize onto the main thread; slow networks freeze.
   static func raw(
     action: String,
     params: [String: String],
@@ -259,7 +259,7 @@ public struct LegacyClient: DNSPodClient {
     }
 
     guard (200..<300).contains(response.statusCode) else {
-      // DNSPod 对无效 login_token 直接回 HTTP 401/403(不带业务信封)——归一为认证失败
+      // DNSPod answers an invalid login_token with bare HTTP 401/403 (no envelope) — normalize to auth failure
       if response.statusCode == 401 || response.statusCode == 403 {
         throw DNSPodError.api(
           code: 401, message: "认证失败(HTTP \(response.statusCode)):Token 无效或已过期")
@@ -267,7 +267,7 @@ public struct LegacyClient: DNSPodClient {
       throw DNSPodError.transport("HTTP \(response.statusCode)")
     }
 
-    // 信封校验:status.code == 1 才算成功
+    // Envelope check: success only when status.code == 1
     struct Envelope: Codable {
       let status: LegacyStatusDTO
     }
@@ -287,7 +287,7 @@ public struct LegacyClient: DNSPodClient {
 }
 
 extension LegacyClient {
-  /// 泛型便捷重载:信封校验后直接解码目标类型(与返回 Data 的 raw 区分命名,避免重载歧义)
+  /// Generic helper: envelope check then decode (named distinctly from raw to avoid overload ambiguity)
   static func rawDecoded<T: Decodable>(
     action: String,
     params: [String: String],

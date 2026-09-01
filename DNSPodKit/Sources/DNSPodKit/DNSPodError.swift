@@ -1,27 +1,27 @@
 import Foundation
 
-/// 统一错误契约:各 API 实现负责把自己的错误形态归一到这里,App 层只认它。
-/// remarkFailed 直接嵌套自身,必须 indirect(否则递归枚举编译崩)。
+/// Unified error contract: impls normalize their errors here; the App knows only this.
+/// remarkFailed nests itself — it must be indirect (recursive enums otherwise crash the compiler).
 public indirect enum DNSPodError: Error, Sendable {
-  /// 网络/解码层失败(请求未成功送达或响应无法解析)
+  /// Network/decoding failure (request never landed or response unparseable)
   case transport(String)
-  /// API 返回业务错误(status.code != 1 / Error.Code)
+  /// API business error (status.code != 1 / Error.Code)
   case api(code: Int, message: String)
-  /// 主操作成功但备注写入失败(非原子的两次调用)——UI 非阻塞提示并刷新列表
+  /// Main op succeeded but the remark write failed (non-atomic pair) — UI shows a non-blocking notice and refreshes
   case remarkFailed(underlying: DNSPodError)
-  /// 该实现未实现此操作(如 TC3 占位期)
+  /// This impl hasn't implemented the op yet (TC3 placeholder phase)
   case notImplemented(String)
-  /// 响应可解码但结构不符合预期
+  /// Response decodes but not into the expected shape
   case invalidResponse(String)
 
-  /// 已知认证失败错误码(凭据失效/格式错),App 据此踢回添加账户页。
-  /// 错误码表随 M1 真实 fixture 补全,先覆盖参考实现可见的行为。
+  /// Known auth-failure codes (bad/expired credentials); the App kicks back to Add Account on these.
+  /// Code table to be completed from M1 real fixtures; covers what the reference surfaced for now.
   public var isAuthenticationFailure: Bool {
     switch self {
     case .api(let code, _):
-      // 1 成功 / 2 系统错误区 …常用认证相关:6 密码错、7 Token 无效、8 Token 过期、
-      // 9 Token 被禁用、16 账号被禁用、30 未授权;401 = DNSPod HTTP 级认证失败
-      //(以实测 fixture 修正)
+      // 1 success / 2 system errors … auth-related: 6 wrong password, 7 invalid token, 8 expired token,
+      // 9 token disabled, 16 account disabled, 30 unauthorized; 401 = DNSPod HTTP-level auth failure
+      //(to be corrected against real fixtures)
       return [6, 7, 8, 9, 16, 30, 401].contains(code)
     case .remarkFailed(let underlying):
       return underlying.isAuthenticationFailure

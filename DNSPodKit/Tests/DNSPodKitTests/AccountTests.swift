@@ -2,7 +2,7 @@ import Testing
 import Foundation
 @testable import DNSPodKit
 
-@Suite("账户模型")
+@Suite("Account model")
 struct AccountTests {
   @Test("粘贴 \"ID,Token\" 自动拆分")
   func parsePasted() throws {
@@ -12,7 +12,7 @@ struct AccountTests {
     #expect(value.token == "aBcDeFgHiJkL")
   }
 
-  @Test("缺一半、多逗号、空串都拒绝")
+  @Test("rejects missing half, extra commas, empty input")
   func parseRejectsInvalid() {
     #expect(Account.parse(pasted: "123456") == nil)
     #expect(Account.parse(pasted: "123456,") == nil)
@@ -20,13 +20,13 @@ struct AccountTests {
     #expect(Account.parse(pasted: "") == nil)
   }
 
-  @Test("默认标签取 Token ID 后 4 位")
+  @Test("default label uses the last 4 of the Token ID")
   func defaultLabel() {
     #expect(Account.defaultLabel(tokenID: "123456") == "账户 3456")
     #expect(Account.defaultLabel(tokenID: "12") == "账户 12")
   }
 
-  @Test("InMemoryAccountStore 增删查")
+  @Test("InMemoryAccountStore save/load/remove")
   func inMemoryStore() async throws {
     let store = InMemoryAccountStore()
     let account = Account(loginTokenID: "123", loginToken: "abc")

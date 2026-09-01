@@ -2,7 +2,7 @@ import Foundation
 import DNSPodKit
 import Observation
 
-/// 记录列表模型:加载/筛选/排序/启停/备注快编/批量(顺序 + 节流)。
+/// Record list model: load/filter/sort/toggle/quick remark/batch (sequential + throttled).
 @MainActor
 @Observable
 final class RecordListModel {
@@ -34,7 +34,7 @@ final class RecordListModel {
   var typeFilter: String?
   var sortOrder: SortOrder = .byName
 
-  /// 批量执行进度
+  /// Batch progress
   private(set) var isBatchRunning = false
 
   func attach(environment: AppEnvironment, domain: DNSDomain) {
@@ -118,7 +118,7 @@ final class RecordListModel {
     }
   }
 
-  /// 批量操作:顺序执行 + 0.3s 节流,失败逐条汇总(传统 API 无批量端点)
+  /// Batch: sequential with a 0.3s throttle; failures reported per item (the legacy API has no batch endpoint)
   func batch(_ records: [DNSRecord], action: BatchAction) async {
     guard let client = environment?.client, let domain, !isBatchRunning else { return }
     isBatchRunning = true

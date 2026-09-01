@@ -1,30 +1,30 @@
 import Foundation
 
-/// DNSPod 客户端能力声明——两代 API 的行为差异显式化,App 层可按能力分支。
+/// Capability flags — API-generational differences made explicit so the App can branch on them.
 public struct DNSPodCapability: Sendable, Hashable {
   public let rawValue: String
   public init(rawValue: String) { self.rawValue = rawValue }
 
-  /// 修改记录时备注直接内联(腾讯云 API 3.0);否则需单独补调 Remark
+  /// Tencent Cloud API 3.0 inlines the remark on modify; otherwise a separate Remark call is needed
   public static let inlineRemark = DNSPodCapability(rawValue: "inlineRemark")
-  /// 服务端批量端点存在
+  /// Server-side batch endpoint exists
   public static let batchStatus = DNSPodCapability(rawValue: "batchStatus")
-  /// 列表接口强分页
+  /// Server list endpoints paginate
   public static let pagination = DNSPodCapability(rawValue: "pagination")
 }
 
-/// 意图级 DNSPod 客户端协议——按业务语义而非端点镜像定义。
+/// Intent-level DNSPodClient protocol — business semantics, not endpoint mirroring.
 ///
-/// 两个实现(传统 API / 腾讯云 API 3.0)的组合差异全部留在实现内部:
-/// - `updateRecord(from:to:)`:LegacyClient 自己决定"备注变化才补调 Record.Remark",
-///   TC3 直接内联;
-/// - `RecordDraft` 的 `@`/MX=10/TTL=600 默认值在构造层补齐;
-/// - 部分失败契约:主操作成功但备注失败时抛 `DNSPodError.remarkFailed`(非原子),
-///   UI 按非阻塞提示处理并刷新列表。
+/// Compositional differences between the two impls (legacy / Tencent Cloud 3.0) stay inside them:
+/// - `updateRecord(from:to:)`: LegacyClient decides "remark changed → follow-up Record.Remark",
+///   TC3 inlines it;
+/// - `RecordDraft` fills its `@`/MX=10/TTL=600 defaults at construction;
+/// - Partial-failure contract: op ok but remark failed → `DNSPodError.remarkFailed` (non-atomic),
+///   the UI surfaces it as a non-blocking notice and refreshes.
 public protocol DNSPodClient: Sendable {
   var capabilities: Set<DNSPodCapability> { get }
 
-  /// 校验凭据。Legacy 实现 = `listDomains()`(error_on_empty=no,空账户也返回 code 1)
+  /// Validate credentials. Legacy: `listDomains()` (error_on_empty=no returns code 1 even when empty)
   func validateCredentials() async throws
 
   func listDomains() async throws -> [DNSDomain]

@@ -2,13 +2,13 @@ import Foundation
 import DNSPodKit
 
 #if DEBUG
-  /// 有内存状态的确定性 mock:SwiftUI Preview 与未来 XCUITest(--uitest-mock)共用。
-  /// create/modify/status/remark 都真实修改内存数据,支持失败注入。
+  /// Deterministic in-memory mock shared by SwiftUI previews and future XCUITests (--uitest-mock).
+  /// create/modify/status/remark all mutate in-memory data; supports failure injection.
   @MainActor
   final class MockDNSPodClient: DNSPodClient {
     nonisolated var capabilities: Set<DNSPodCapability> { [] }
 
-    /// 置 true 后下一次调用抛认证失败(UI 测试场景:--uitest-scenario auth_failure)
+    /// When true, the next call throws an auth failure (UI-test scenario: --uitest-scenario auth_failure)
     var failNextCall = false
 
     private(set) var domains: [DNSDomain]

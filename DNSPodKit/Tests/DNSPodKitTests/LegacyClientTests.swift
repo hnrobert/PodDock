@@ -4,7 +4,7 @@ import Foundation
 
 // MARK: - Fixtures
 //
-// 形态来自参考实现与 docs.dnspod.cn 示例;M1 用真 token 抓取替换为 Fixtures/*.json 文件。
+// Shapes from the reference and docs.dnspod.cn samples; M1 replaces these with real-token Fixtures/*.json.
 
 enum Fixtures {
   static let domainList = """
@@ -51,7 +51,7 @@ enum Fixtures {
     """
 }
 
-@Suite("LegacyClient 请求构造与解码")
+@Suite("LegacyClient request building and decoding")
 struct LegacyClientTests {
   static let tokenID = "12345"
   static let tokenKey = "abcXYZ"
@@ -65,7 +65,7 @@ struct LegacyClientTests {
     return FormEncoder.decode(String(decoding: body, as: UTF8.self))
   }
 
-  @Test("公共参数与 login_token 拼接格式")
+  @Test("common params and login_token assembly")
   func commonParams() async throws {
     let mock = MockTransport()
     await mock.enqueue(ok: Fixtures.domainList)
@@ -84,7 +84,7 @@ struct LegacyClientTests {
     #expect(fields["error_on_empty"] == "no")
   }
 
-  @Test("域名列表解码:数字字符串状态、未知 grade 不崩")
+  @Test("domain list decoding: string-numbered status, unknown grade doesn't crash")
   func domainListDecoding() async throws {
     let mock = MockTransport()
     await mock.enqueue(ok: Fixtures.domainList)
@@ -100,13 +100,13 @@ struct LegacyClientTests {
     #expect(first.recordCount == 12)
     let second = domains[1]
     #expect(second.state == .pause)
-    // 未知 grade 原样保留(参考实现此处 KeyError 500)
+    // Unknown grades pass through verbatim (the reference app KeyErrors into a 500 here)
     #expect(domains[2].grade == "WEIRD_FUTURE_GRADE")
     #expect(domains[2].state == .spam)
     #expect(domains[2].recordCount == 0)
   }
 
-  @Test("记录列表解码:数字当字符串与真数字混合都解")
+  @Test("record list decoding: string and real numbers both decode")
   func recordListDecoding() async throws {
     let mock = MockTransport()
     await mock.enqueue(ok: Fixtures.recordList)
@@ -130,14 +130,14 @@ struct LegacyClientTests {
     #expect(mx.mx == 10)
     #expect(mx.remark == "mail")
 
-    // 第三条全部用真数字/真布尔,同样要解出来
+    // The third uses real numbers/bools and must decode too
     let api = page.records[2]
     #expect(api.id == RecordID("154169994"))
     #expect(api.line == "联通")
     #expect(api.ttl == 120)
   }
 
-  @Test("Record.Info 用 record_type/record_line 键名也能归一")
+  @Test("Record.Info normalizes record_type/record_line keys")
   func recordInfoDecoding() async throws {
     let mock = MockTransport()
     await mock.enqueue(ok: Fixtures.recordInfo)
@@ -150,7 +150,7 @@ struct LegacyClientTests {
     #expect(record.remark == "主站")
   }
 
-  @Test("Domain.Status 线格式发 enable/disable")
+  @Test("Domain.Status sends enable/disable on the wire")
   func domainStatusWire() async throws {
     let mock = MockTransport()
     await mock.enqueue(ok: Fixtures.ok)
@@ -166,7 +166,7 @@ struct LegacyClientTests {
     #expect(try body(of: requests[1])["status"] == "enable")
   }
 
-  @Test("Record.Create 字段与默认值;备注非空恰好补调一次 Remark")
+  @Test("Record.Create fields and defaults; non-empty remark triggers exactly one Remark")
   func createRecordWithRemark() async throws {
     let mock = MockTransport()
     await mock.enqueue(ok: Fixtures.recordCreate)
@@ -187,7 +187,7 @@ struct LegacyClientTests {
     #expect(requests.count == 2)
     let create = try body(of: requests[0])
     #expect(requests[0].url.lastPathComponent == "Record.Create")
-    // 空主机记录补 @、MX/TTL 默认值在草稿层补齐
+    // Empty host becomes @; MX/TTL defaults filled at the draft layer
     #expect(create["sub_domain"] == "@")
     #expect(create["record_type"] == "A")
     #expect(create["record_line"] == "默认")
@@ -201,7 +201,7 @@ struct LegacyClientTests {
     #expect(remark["remark"] == "新站")
   }
 
-  @Test("Record.Create 无备注不补调 Remark")
+  @Test("Record.Create without a remark skips the Remark call")
   func createRecordWithoutRemark() async throws {
     let mock = MockTransport()
     await mock.enqueue(ok: Fixtures.recordCreate)
@@ -217,7 +217,7 @@ struct LegacyClientTests {
     #expect(count == 1)
   }
 
-  @Test("updateRecord:备注变化才补调 Remark;未变化只调 Modify")
+  @Test("updateRecord: remark change triggers Remark; unchanged calls only Modify")
   func updateRecordRemarkDiff() async throws {
     let mock = MockTransport()
     await mock.enqueue(ok: Fixtures.ok)
@@ -245,7 +245,7 @@ struct LegacyClientTests {
     #expect(modify["ttl"] == "300")
     #expect(requests[1].url.lastPathComponent == "Record.Remark")
 
-    // 备注未变化 → 只有一次 Modify
+    // Remark unchanged → a single Modify call
     let mock2 = MockTransport()
     await mock2.enqueue(ok: Fixtures.ok)
     let client2 = makeClient(mock2)
@@ -257,7 +257,7 @@ struct LegacyClientTests {
     #expect(requests.count == 1)
   }
 
-  @Test("信封错误码映射为 DNSPodError.api,认证失败可判别")
+  @Test("envelope errors map to DNSPodError.api with detectable auth failures")
   func errorMapping() async throws {
     let mock = MockTransport()
     await mock.enqueue(ok: Fixtures.authFailure)
@@ -267,7 +267,7 @@ struct LegacyClientTests {
     await #expect(throws: DNSPodError.self) {
       _ = try await client.listDomains()
     }
-    // 直接校验归一化结果
+    // Verify the normalized result directly
     do {
       _ = try await client.listDomains()
       Issue.record("应抛错")
@@ -282,7 +282,7 @@ struct LegacyClientTests {
     }
   }
 
-  @Test("备注写入失败降级为部分失败 remarkFailed(主操作已成功)")
+  @Test("remark write failure degrades to remarkFailed (main op already succeeded)")
   func remarkPartialFailure() async throws {
     let mock = MockTransport()
     await mock.enqueue(ok: Fixtures.recordCreate)
@@ -302,12 +302,12 @@ struct LegacyClientTests {
         Issue.record("应为 .remarkFailed,实际 \(error)")
         return
       }
-      // 底层是认证失败 → 部分失败也应触发"踢回账户页"
+      // Underlying is auth failure → partial failure should still kick back to accounts
       #expect(error.isAuthenticationFailure)
     }
   }
 
-  @Test("非 2xx 响应映射为 transport 错误;HTTP 401 归一为认证失败")
+  @Test("non-2xx maps to transport error; HTTP 401 normalizes to auth failure")
   func httpError() async throws {
     let mock = MockTransport()
     await mock.enqueue(.success(HTTPResponse(statusCode: 502, body: Data("bad gateway".utf8))))
@@ -324,7 +324,7 @@ struct LegacyClientTests {
       }
     }
 
-    // 401 → .api(401) 且判为认证失败(踢回账户页/登录提示)
+    // 401 → .api(401), treated as auth failure (kick back to account page / login prompt)
     do {
       _ = try await client.listDomains()
       Issue.record("应抛错")
@@ -338,7 +338,7 @@ struct LegacyClientTests {
     }
   }
 
-  @Test("recordOptions:Record.Type 用 domain_grade 参数,Line 用 domain_id + domain_grade")
+  @Test("recordOptions: Record.Type uses domain_grade; Line uses domain_id + domain_grade")
   func recordOptionsWire() async throws {
     let mock = MockTransport()
     await mock.enqueue(ok: Fixtures.recordTypes)

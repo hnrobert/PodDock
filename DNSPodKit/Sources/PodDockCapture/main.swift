@@ -1,16 +1,16 @@
 import Foundation
 import DNSPodKit
 
-// poddock-capture —— 真实 API 响应抓取工具(M1 验收:fixture 录制 + 错误码表核对)。
+// poddock-capture — records real API responses (M1 acceptance: fixtures + error-code table).
 //
-// 在 DNSPodKit/ 目录下运行:
+// Run from the DNSPodKit/ directory:
 //
 //   DNSPOD_TOKEN="ID,Token" swift run poddock-capture --domain example.com
-//   # 追加 --record-id 123:额外抓 Record.Info
-//   # 追加 --full:在该域名上走临时记录完整生命周期(create/remark/modify/status/remove)
+//   # add --record-id 123: also capture Record.Info
+//   # add --full: run the temp-record lifecycle on that domain (create/remark/modify/status/remove)
 //
-// 产物写入 Tests/DNSPodKitTests/Fixtures/*.json。
-// ⚠️ 文件内容含你账户的真实域名/记录,提交前自行脱敏!
+// Output goes to Tests/DNSPodKitTests/Fixtures/*.json.
+// Files contain your real domains/records — scrub before committing!
 
 let arguments = CommandLine.arguments.dropFirst()
 var domain: String?
@@ -92,7 +92,7 @@ if let domain, !domain.isEmpty {
       do {
         let record = try await client.createRecord(draft, in: found)
         print("✓ 已创建临时记录 \(record)")
-        try await Task.sleep(for: .seconds(2))  // 新记录有短暂索引延迟
+        try await Task.sleep(for: .seconds(2))  // new records have a brief indexing delay
 
         let created = try await client.fetchRecord(id: record, domainID: found.id)
         await capture("record_info", "Record.Info", ["domain_id": domainID, "record_id": record.rawValue])

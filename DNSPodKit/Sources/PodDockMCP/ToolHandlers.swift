@@ -5,7 +5,7 @@ import DNSPodKit
 // MARK: - JSONValue ↔ MCP Value
 
 extension JSONValue {
-  /// Kit 的 JSON 树转 MCP 的 Value(工具 schema 的单一契约源 → MCP 工具定义)
+  /// Kit JSON tree → MCP Value (catalog schema → MCP tool definitions)
   var mcpValue: Value {
     switch self {
     case .null: .null
@@ -18,7 +18,7 @@ extension JSONValue {
     }
   }
 
-  /// MCP Value → Kit 的 JSON 树(工具调用参数 → ToolDispatch)
+  /// MCP Value → Kit JSON tree (tool arguments → ToolDispatch)
   init(mcp value: Value) {
     switch value {
     case .null: self = .null
@@ -33,7 +33,7 @@ extension JSONValue {
   }
 }
 
-/// MCP 参数([String: Value])→ ToolDispatch 参数([String: JSONValue])
+/// MCP arguments ([String: Value]) → ToolDispatch arguments ([String: JSONValue])
 enum MCPArgumentBridge {
   static func convert(_ arguments: [String: Value]?) -> [String: JSONValue] {
     (arguments ?? [:]).mapValues { JSONValue(mcp: $0) }

@@ -1,10 +1,10 @@
 import Foundation
 
-/// application/x-www-form-urlencoded 编码。
+/// application/x-www-form-urlencoded encoding.
 ///
-/// 关键约束:`record_line_id` 的值形如 `10=0`,其中的 `=` 必须转义为 `%3D`,
-/// 否则 DNSPod 解析错位;中文线路名按 UTF-8 百分号编码。
-/// 字段按 key 排序,保证请求构造可被确定性断言。
+/// Key constraint: `record_line_id` looks like `10=0` — the `=` must escape to `%3D`,
+/// or DNSPod mis-parses; Chinese line names percent-encode as UTF-8.
+/// Fields sorted by key so request construction asserts deterministically.
 public enum FormEncoder {
   public static func encode(_ fields: [String: String]) -> String {
     fields
@@ -17,7 +17,7 @@ public enum FormEncoder {
     Data(encode(fields).utf8)
   }
 
-  /// 逆解码(仅供测试与 mock 断言)
+  /// Inverse decode (tests and mock assertions only)
   public static func decode(_ query: String) -> [String: String] {
     var result: [String: String] = [:]
     for pair in query.split(separator: "&") {

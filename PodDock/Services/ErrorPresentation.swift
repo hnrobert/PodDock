@@ -2,8 +2,8 @@ import Foundation
 import DNSPodKit
 
 extension DNSPodError {
-  /// App 层错误文案:英文键 + String Catalog(zh-Hans 翻译),随系统语言。
-  /// Kit 内部的中文 `localizedDescription` 只服务 MCP / CLI 宿主,不进 App UI。
+  /// App-level error text: English keys + String Catalog (zh-Hans), following the system language.
+  /// The Kit's Chinese localizedDescription only serves MCP/CLI hosts, never App UI.
   var uiMessage: String {
     switch self {
     case .transport(let detail):
@@ -20,9 +20,9 @@ extension DNSPodError {
   }
 }
 
-/// 任意错误的 UI 文案:DNSPodError 走本地化映射;
-/// 其余(KeychainError、LAContext 等系统错误)的 localizedDescription 本身随系统语言。
-/// 命名避开模型里的 `errorMessage` 存储属性。
+/// UI text for any error: DNSPodError goes through the localized mapping;
+/// everything else (KeychainError, LAContext, …) already localizes via localizedDescription.
+/// Named to avoid the models' `errorMessage` property.
 func describeError(_ error: Error) -> String {
   (error as? DNSPodError)?.uiMessage ?? error.localizedDescription
 }

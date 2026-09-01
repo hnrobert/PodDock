@@ -1,7 +1,7 @@
 import SwiftUI
 import DNSPodKit
 
-/// DoH 生效检测:多 provider,可回退系统解析(结果标注来源)。
+/// DoH propagation check: multiple providers with system fallback (labeled source).
 struct DoHPanelView: View {
   @Environment(AppEnvironment.self) private var environment
   @Environment(\.dismiss) private var dismiss

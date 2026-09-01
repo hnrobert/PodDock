@@ -3,8 +3,8 @@ import DNSPodKit
 import PodDockMCP
 import Observation
 
-/// macOS App 内嵌 MCP 宿主:设置里开关;监听 127.0.0.1,自动生成 Bearer;
-/// 与 App 共享当前账户与同一 DNSPodClient——外部 AI 客户端操作的就是 App 正在管的账号。
+/// macOS embedded MCP host: a settings toggle; listens on 127.0.0.1 with an auto-generated bearer;
+/// Shares the app's current account and DNSPodClient — external AI clients drive the very account the app manages.
 @MainActor
 @Observable
 final class MCPHostService {
@@ -15,7 +15,7 @@ final class MCPHostService {
   private var handle: MCPServerService.HostHandle?
   private var runTask: Task<Void, Never>?
 
-  /// 自动生成的端点 Bearer(与账户认证独立)
+  /// Auto-generated endpoint bearer (independent of account auth)
   private(set) var bearerToken: String
 
   private let service: MCPServerService
@@ -36,7 +36,7 @@ final class MCPHostService {
 
   var endpointURL: String { "http://127.0.0.1:28100/mcp" }
 
-  /// 一键接入串(claude mcp add …)
+  /// One-line connect command (claude mcp add …)
   var connectCommand: String {
     "claude mcp add --transport http --header \"Authorization: Bearer \(bearerToken)\" poddock \(endpointURL)"
   }

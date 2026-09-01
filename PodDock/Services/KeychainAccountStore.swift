@@ -2,13 +2,13 @@ import Foundation
 import Security
 import DNSPodKit
 
-/// Keychain 账户存储(Security 框架 Apple 专用,故在 App target 而非 Kit)。
+/// Keychain account store (the Security framework is Apple-only, hence App target, not Kit).
 ///
-/// 每账户一条 generic password:account = UUID(不用 Token ID 当 key,便于换标签),
-/// value = Account JSON。优先走 Data Protection Keychain(`kSecUseDataProtectionKeychain
-/// = true`,与 iOS 一致);但当进程缺少 entitlement 上下文时(macOS -34018
-/// errSecMissingEntitlement——典型:从调试器直接启动裸二进制、无开发团队的临时签名),
-/// 自动降级到文件钥匙串并记住该模式,避免开发环境完全不可用。
+/// One generic password per account: account = UUID (not the Token ID, so labels can change),
+/// value = Account JSON. Prefers the Data Protection Keychain (`kSecUseDataProtectionKeychain
+/// = true`, matching iOS); but when the process lacks entitlement context (macOS -34018
+/// errSecMissingEntitlement — typical: a bare binary launched from a debugger, ad-hoc signing with no team),
+/// Falls back to the file keychain and remembers the mode, keeping dev environments usable.
 final class KeychainError: LocalizedError {
   let status: OSStatus
   init(status: OSStatus) { self.status = status }
@@ -20,7 +20,7 @@ final class KeychainError: LocalizedError {
 final class KeychainAccountStore: AccountStoring, @unchecked Sendable {
   let service: String
   private let lock = NSLock()
-  /// 已探测到无 entitlement 上下文时置 false,后续直接走文件钥匙串
+  /// Set false once an entitlement context is found missing; later calls go straight to the file keychain
   private var useDataProtection = true
 
   init(service: String = "com.robert.poddock.account") {
@@ -41,7 +41,7 @@ final class KeychainAccountStore: AccountStoring, @unchecked Sendable {
     return query
   }
 
-  /// 在指定钥匙串模式执行;-34018(entitlement 缺失)时标记全局降级偏好
+  /// Run in a specific keychain mode; on -34018 (missing entitlement) flag the global fallback
   private func performIn(_ dataProtection: Bool, _ operation: (Bool) -> OSStatus) -> OSStatus {
     let status = operation(dataProtection)
     if status == errSecMissingEntitlement && dataProtection {
@@ -52,7 +52,7 @@ final class KeychainAccountStore: AccountStoring, @unchecked Sendable {
     return status
   }
 
-  /// 写路径:按当前偏好模式执行,-34018 自动降级重试
+  /// Write path: run in the preferred mode, auto-retry on -34018
   private func perform(_ operation: (Bool) -> OSStatus) throws {
     lock.lock()
     let preferDataProtection = useDataProtection
@@ -67,7 +67,7 @@ final class KeychainAccountStore: AccountStoring, @unchecked Sendable {
     }
   }
 
-  // MARK: - 同步实现(SecItem 操作微小,无阻塞风险)
+  // MARK: - Sync implementation (SecItem ops are tiny, no blocking risk)
 
   private func saveSync(_ account: Account) throws {
     let data = try JSONEncoder().encode(account)
@@ -92,7 +92,7 @@ final class KeychainAccountStore: AccountStoring, @unchecked Sendable {
   }
 
   private func accountSync(id: UUID) -> Account? {
-    // 双模式读取:账户可能存在任一钥匙串(例如调试会话存进了文件钥匙串)
+    // Read both modes: an account may live in either keychain (e.g. a debug session wrote the file keychain)
     for dataProtection in [true, false] {
       var result: Account?
       _ = performIn(dataProtection) { dp in
@@ -115,7 +115,7 @@ final class KeychainAccountStore: AccountStoring, @unchecked Sendable {
   }
 
   private func accountsSync() -> [Account] {
-    // 双模式读取并按 UUID 合并(同一账户可能只存在于其中一侧)
+    // Read both modes and merge by UUID (an account may exist on only one side)
     var merged: [UUID: Account] = [:]
     for dataProtection in [true, false] {
       _ = performIn(dataProtection) { dp in
@@ -145,7 +145,7 @@ final class KeychainAccountStore: AccountStoring, @unchecked Sendable {
     }
   }
 
-  // MARK: - AccountStoring(协议是 async,桥接同步实现)
+  // MARK: - AccountStoring (protocol is async; bridges the sync impl)
 
   func save(_ account: Account) async throws { try saveSync(account) }
   func account(id: UUID) async throws -> Account? { accountSync(id: id) }

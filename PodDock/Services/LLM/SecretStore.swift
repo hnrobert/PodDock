@@ -1,7 +1,7 @@
 import Foundation
 import Security
 
-/// 单密钥 Keychain 存取(LLM API Key;与账户存储同款双模式 + -34018 降级策略)
+/// Single-secret Keychain store (LLM API key; same dual-mode + -34018 fallback as the account store)
 struct SecretStore: Sendable {
   let service: String
   let account: String

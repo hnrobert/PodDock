@@ -1,9 +1,9 @@
 import Foundation
 
-// MARK: - 轻量 JSON 值树
+// MARK: - Lightweight JSON value tree
 //
-// MCP 工具 schema 与 LLM tool definition 共用的 JSON 表示,
-// 不引入任何第三方依赖,也不耦合 swift-sdk 类型(升级 SDK 只动 Server 层)。
+// JSON representation shared by MCP tool schemas and LLM tool definitions;
+// No third-party deps, no swift-sdk types (SDK upgrades only touch the server layer).
 
 public enum JSONValue: Sendable, Equatable {
   case null
@@ -52,18 +52,18 @@ extension JSONValue: Codable {
   }
 }
 
-// MARK: - 工具定义
+// MARK: - Tool definition
 
-/// 一件 DNS 操作工具的 MCP 标准描述。
-/// 同一份定义同时驱动:① PodDockMCP 的 tools/list、tools/call;
-/// ② App LLM 助手的 tool definitions(Anthropic / OpenAI 兼容)——单一契约源,永不漂移。
+/// Standard MCP description of one DNS tool.
+/// One definition drives both: PodDockMCP's tools/list + tools/call,
+/// the App LLM assistant's tool definitions (Anthropic / OpenAI-compatible) — one source, zero drift.
 public struct MCPToolDefinition: Sendable, Equatable, Identifiable {
   public let name: String
   public let description: String
   public let inputSchema: JSONValue
-  /// 只读工具(不改变任何状态)
+  /// Read-only tool (no state changes)
   public let isReadOnly: Bool
-  /// 破坏性工具(删除类;修改/启停不算)
+  /// Destructive tool (deletions; edits/toggles don't count)
   public let isDestructive: Bool
 
   public var id: String { name }
@@ -80,7 +80,7 @@ public struct MCPToolDefinition: Sendable, Equatable, Identifiable {
   }
 }
 
-// MARK: - 目录
+// MARK: - Catalog
 
 public enum MCPToolCatalog {
   private static func objectSchema(
@@ -111,7 +111,7 @@ public enum MCPToolCatalog {
     ])
   }
 
-  /// 全部工具。名称与 DNSPodClient 意图一一对应。
+  /// All tools; names map one-to-one onto DNSPodClient intents.
   public static let all: [MCPToolDefinition] = [
     MCPToolDefinition(
       name: "list_domains",

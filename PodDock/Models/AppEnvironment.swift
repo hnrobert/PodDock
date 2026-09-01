@@ -2,7 +2,7 @@ import Foundation
 import DNSPodKit
 import Observation
 
-/// App 根模型:账户装配/切换、client 工厂、锁、--uitest-mock 钩子。
+/// App root model: account wiring/switching, client factory, lock, --uitest-mock hook.
 @MainActor
 @Observable
 final class AppEnvironment {
@@ -17,7 +17,7 @@ final class AppEnvironment {
   private(set) var accounts: [Account] = []
   private(set) var client: DNSPodClient?
 
-  /// 当前账户操作反馈(非阻塞错误/部分成功提示)
+  /// Non-blocking feedback for current-account operations (errors / partial success)
   var latestMessage: String?
 
   init(accountStore: AccountStoring? = nil, preferences: PreferencesStore? = nil) {
@@ -55,13 +55,13 @@ final class AppEnvironment {
     domains.attach(environment: self)
   }
 
-  /// 启动装配:读账户 → 恢复当前账户 → 拉域名
+  /// Bootstrap: load accounts → restore the current one → fetch domains
   func bootstrap() async {
     domains.attach(environment: self)
     assistant.attach(environment: self)
     mcpHost.attach(environment: self)
     if isMockMode {
-      // mock 模式:client 已在 init 注入(activate 会用真实实现覆盖它)
+      // Mock mode: client injected in init (activate would overwrite it with a real one)
       await domains.load()
       return
     }
@@ -78,8 +78,8 @@ final class AppEnvironment {
     accounts.first { $0.id == preferences.currentAccountID }
   }
 
-  /// client 工厂:按账户的 API 风味装配对应实现;
-  /// `lang` 跟随系统语言,让 DNSPod 服务端错误消息也用对应语言返回
+  /// Client factory: builds the matching impl for the account's API flavor;
+  /// `lang` follows the system language so DNSPod server errors come back in it too
   static func makeClient(for account: Account) -> DNSPodClient {
     switch account.apiFlavor {
     case .legacy:
@@ -95,7 +95,7 @@ final class AppEnvironment {
     Locale.current.language.languageCode?.identifier.hasPrefix("zh") == true ? "cn" : "en"
   }
 
-  /// 添加账户:先用临时 client 验证凭据(Domain.List 兼任),通过才落 Keychain
+  /// Add account: validate credentials with a throwaway client (Domain.List doubles for this) before touching Keychain
   func addAccount(tokenID: String, tokenKey: String, label: String?) async throws {
     let account = Account(label: label, loginTokenID: tokenID, loginToken: tokenKey)
     let candidate = Self.makeClient(for: account)
@@ -134,7 +134,7 @@ final class AppEnvironment {
     client = Self.makeClient(for: account)
   }
 
-  /// 认证失败时踢回:移除失效凭据并提示重新添加
+  /// On auth failure: drop the stale credentials and prompt to re-add
   func handleAuthenticationFailure() async {
     guard let current = currentAccount else { return }
     latestMessage = String(

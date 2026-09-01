@@ -2,13 +2,13 @@ import Testing
 import Foundation
 @testable import DNSPodKit
 
-@Suite("RecordOptionsProvider 缓存语义")
+@Suite("RecordOptionsProvider caching semantics")
 struct RecordOptionsProviderTests {
   private func domain(_ grade: String = "DP_Free", id: String = "2317346") -> DNSDomain {
     DNSDomain(id: DomainID(id), name: "example.com", grade: grade, state: .enable, recordCount: 0, updatedOn: "")
   }
 
-  @Test("同一 grade 的 type、同一 domain 的 line 只拉取一次")
+  @Test("types fetched once per grade, lines once per domain")
   func cachesPerGradeAndDomain() async throws {
     let typeFetches = Counter()
     let lineFetches = Counter()
@@ -23,18 +23,18 @@ struct RecordOptionsProviderTests {
       })
 
     let d1 = domain()
-    let d2 = domain(id: "9999999")  // 同 grade 不同域名
+    let d2 = domain(id: "9999999")  // same grade, different domain
     _ = try await provider.options(for: d1)
     _ = try await provider.options(for: d1)
     _ = try await provider.options(for: d2)
 
     let typeCount = await typeFetches.count
     let lineCount = await lineFetches.count
-    #expect(typeCount == 1)  // grade 相同 → type 只拉一次
-    #expect(lineCount == 2)  // domain 不同 → line 各拉一次
+    #expect(typeCount == 1)  // same grade → type fetched once
+    #expect(lineCount == 2)  // different domain → line fetched per domain
   }
 
-  @Test("不同 grade 的 type 分别拉取")
+  @Test("types fetched per distinct grade")
   func gradeIsolation() async throws {
     let fetches = Counter()
     let provider = RecordOptionsProvider(
@@ -51,7 +51,7 @@ struct RecordOptionsProviderTests {
     #expect(count == 2)
   }
 
-  @Test("reset 后重新拉取")
+  @Test("refetches after reset")
   func reset() async throws {
     let fetches = Counter()
     let provider = RecordOptionsProvider(
@@ -70,7 +70,7 @@ struct RecordOptionsProviderTests {
   }
 }
 
-/// 线程安全计数器
+/// Thread-safe counter
 actor Counter {
   private(set) var count = 0
   func increment() {

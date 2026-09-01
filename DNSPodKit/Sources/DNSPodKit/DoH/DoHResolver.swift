@@ -3,10 +3,10 @@ import Foundation
   import FoundationNetworking
 #endif
 
-// MARK: - DoH 解析生效检测
+// MARK: - DoH propagation check
 //
-// 不走 dnsapi.cn,独立于 DNSPodClient 协议。
-// 默认 provider 选大陆可达的腾讯/阿里;dns.google 在大陆基本不可用,仅作可选项。
+// Not via dnsapi.cn; independent of the DNSPodClient protocol.
+// Defaults pick mainland-reachable Tencent/Ali DoH; dns.google is mostly unreachable there, kept as an option.
 
 public enum DoHProvider: String, Sendable, CaseIterable, Identifiable {
   case aliyun
@@ -16,7 +16,7 @@ public enum DoHProvider: String, Sendable, CaseIterable, Identifiable {
 
   public var id: String { rawValue }
 
-  /// JSON API(Google DNS API 风格:?name=&type=)
+  /// JSON API (Google DNS style: ?name=&type=)
   public var endpoint: URL {
     switch self {
     case .aliyun: URL(string: "https://dns.alidns.com/resolve")!
@@ -37,7 +37,7 @@ public enum DoHProvider: String, Sendable, CaseIterable, Identifiable {
 }
 
 public struct DoHAnswer: Sendable, Equatable {
-  /// 记录类型编号(1=A, 28=AAAA, 5=CNAME, 15=MX, 16=TXT)
+  /// Record type numbers (1=A, 28=AAAA, 5=CNAME, 15=MX, 16=TXT)
   public let type: Int
   public let ttl: Int
   public let data: String
@@ -45,7 +45,7 @@ public struct DoHAnswer: Sendable, Equatable {
 
 public enum DoHSource: Sendable, Equatable {
   case doh(DoHProvider)
-  /// M2:DoH 不可达时回退系统解析,结果必须标注来源
+  /// M2: fall back to the system resolver when DoH is unreachable; label the source
   case system
 }
 
@@ -55,7 +55,7 @@ public struct DoHResult: Sendable, Equatable {
   public let source: DoHSource
 }
 
-/// DoH 查询器。M2 补:3–5s 硬超时 + 系统解析回退(结果标注来源)。
+/// DoH resolver. M2 adds: a 3–5s hard timeout + system fallback (labeled source).
 public struct DoHResolver: Sendable {
   public let provider: DoHProvider
   private let transport: HTTPTransport
@@ -66,7 +66,7 @@ public struct DoHResolver: Sendable {
   }
 
   public func resolve(name: String, recordType: String = "A") async throws -> DoHResult {
-    // SE-0461:非隔离 async 继承调用方 actor;DoH 往返与解码必须离开主线程
+    // SE-0461: nonisolated async inherits the caller's actor; DoH round-trips and decoding must leave the main thread
     let provider = self.provider
     let transport = self.transport
     return try await Task.detached(priority: .userInitiated) {
@@ -123,7 +123,7 @@ public struct DoHResolver: Sendable {
     )
   }
 
-  /// 记录类型名 → 线格式编号
+  /// Record type name → wire number
   public static func wireType(for recordType: String) -> Int {
     switch recordType.uppercased() {
     case "A": 1
@@ -139,15 +139,15 @@ public struct DoHResolver: Sendable {
     }
   }
 
-  /// DoH 优先,失败回退系统解析(Apple 平台;结果必须标注来源)。
-  /// 仅 A 记录可回退;其余类型直接抛 DoH 的原始错误。
+  /// DoH first, system-resolver fallback (Apple platforms; results must carry their source).
+  /// Only A records fall back; other types rethrow the DoH error.
   public func resolveWithFallback(name: String, recordType: String = "A") async throws -> DoHResult {
     do {
       return try await resolve(name: name, recordType: recordType)
     } catch {
       #if canImport(Darwin)
         if recordType.uppercased() == "A" {
-          // getaddrinfo 是阻塞调用,同样必须离开主线程
+          // getaddrinfo blocks; it must also leave the main thread
           let addresses = await Task.detached(priority: .userInitiated) {
             SystemIPv4Resolver.resolve(name: name)
           }.value
@@ -168,7 +168,7 @@ public struct DoHResolver: Sendable {
 #if canImport(Darwin)
   import Darwin
 
-  /// getaddrinfo 直查 A 记录(系统解析回退,Apple 平台)
+  /// getaddrinfo A-record lookup (system fallback, Apple platforms)
   enum SystemIPv4Resolver {
     static func resolve(name: String) -> [String] {
       var hints = addrinfo()

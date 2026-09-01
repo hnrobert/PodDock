@@ -1,7 +1,7 @@
 import SwiftUI
 import DNSPodKit
 
-/// 根路由:锁 → 无账户(添加账户)→ 主界面
+/// Root routing: lock → no account (add one) → main UI
 struct RootView: View {
   @Environment(AppEnvironment.self) private var environment
 
@@ -18,7 +18,7 @@ struct RootView: View {
   }
 }
 
-/// macOS 侧栏域名 + 详情记录;紧凑态自动退化为 push 导航(iOS 亦可用)
+/// macOS sidebar domains + detail records; collapses to push navigation on iOS
 struct MainSplitView: View {
   @Environment(AppEnvironment.self) private var environment
   @State private var selectedDomainID: DomainID?
@@ -39,8 +39,8 @@ struct MainSplitView: View {
     }
     #if DEBUG
       .task {
-        // 调试钩子:--autoselect 自动选中第一个域名(复现"选中即卡死"类问题);
-        // 等待 bootstrap 拉完域名列表,避免竞态取到空
+        // Debug hook: --autoselect picks the first domain (reproduces select-to-crash issues);
+        // Wait for bootstrap to finish loading domains; racing it reads empty
         guard ProcessInfo.processInfo.arguments.contains("--autoselect") else { return }
         for _ in 0..<50 {
           if selectedDomainID != nil { return }

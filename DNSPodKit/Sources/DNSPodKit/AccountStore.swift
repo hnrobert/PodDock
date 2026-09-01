@@ -1,13 +1,13 @@
 import Foundation
 
-/// 账户的 API 风味——决定用哪个 DNSPodClient 实现。
+/// Account API flavor — picks the DNSPodClient impl.
 public enum APIFlavor: String, Sendable, Codable, CaseIterable {
   case legacy
   case tencentCloud
 }
 
-/// 一套 DNSPod 凭据。label 为本地手填(传统 API 无账户资料接口),
-/// 默认 `账户 <ID 后 4 位>`。
+/// One DNSPod credential set. The label is local (the legacy API has no profile endpoint),
+/// Defaults to `Account <last 4 of the ID>`.
 public struct Account: Identifiable, Hashable, Sendable, Codable {
   public let id: UUID
   public var label: String
@@ -37,7 +37,7 @@ public struct Account: Identifiable, Hashable, Sendable, Codable {
     return "账户 \(suffix)"
   }
 
-  /// "ID,Token" 粘贴拆分(登录辅助:整串粘贴自动填两栏)
+  /// Parses a pasted "ID,Token" (login helper: one paste fills both fields)
   public static func parse(pasted: String) -> (id: String, token: String)? {
     let parts = pasted
       .split(separator: ",", omittingEmptySubsequences: false)
@@ -47,8 +47,8 @@ public struct Account: Identifiable, Hashable, Sendable, Codable {
   }
 }
 
-/// 账户存取协议。Keychain 实现在 App target(Security 框架 Apple 专用,Kit 保持 Linux 纯净);
-/// 测试 / XCUITest / 未来 CLI 用 InMemoryAccountStore(CLI 用环境变量装配)。
+/// Account storage protocol. The Keychain impl lives in the App target (Security is Apple-only; the Kit stays Linux-clean);
+/// Tests/XCUITests/the future CLI use InMemoryAccountStore (the CLI wires it from env vars).
 public protocol AccountStoring: Sendable {
   func save(_ account: Account) async throws
   func account(id: UUID) async throws -> Account?
@@ -56,7 +56,7 @@ public protocol AccountStoring: Sendable {
   func remove(id: UUID) async throws
 }
 
-/// 内存实现:测试、XCUITest(--uitest-mock 模式)、SwiftUI Preview。
+/// In-memory impl: tests, XCUITests (--uitest-mock), SwiftUI previews.
 public actor InMemoryAccountStore: AccountStoring {
   private var storage: [UUID: Account] = [:]
 

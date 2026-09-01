@@ -1,7 +1,7 @@
 import SwiftUI
 import DNSPodKit
 
-/// 添加账户:凭据验证通过才落 Keychain。
+/// Add account: credentials verified before Keychain.
 struct AddAccountView: View {
   @Environment(AppEnvironment.self) private var environment
 

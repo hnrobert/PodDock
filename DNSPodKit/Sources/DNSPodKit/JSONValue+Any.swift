@@ -1,7 +1,7 @@
 import Foundation
 
 extension JSONValue {
-  /// JSONSerialization 树 → JSONValue(LLM 客户端解析响应用)
+  /// JSONSerialization tree → JSONValue (LLM clients parsing responses)
   public init?(any: Any) {
     switch any {
     case is NSNull: self = .null
@@ -34,7 +34,7 @@ extension JSONValue {
     }
   }
 
-  /// JSONValue → JSONSerialization 树(构造请求体用)
+  /// JSONValue → JSONSerialization tree (building request bodies)
   public var anyValue: Any {
     switch self {
     case .null: NSNull()
