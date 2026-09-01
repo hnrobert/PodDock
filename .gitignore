@@ -5,6 +5,9 @@
 ## User settings
 xcuserdata/
 
+## Machine-local LSP/BSP config (regenerate via scripts/setup-lsp.sh)
+buildServer.json
+
 ## Obj-C/Swift specific
 *.hmap
 

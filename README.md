@@ -38,6 +38,17 @@ cd DNSPodKit && swift run poddock-mcp
 # 然后让模型调用 dnspod_login 提供 "ID,Token"
 ```
 
+## 开发环境(IDE 索引)
+
+VS Code 需要一次性生成本机的 SourceKit-LSP 配置(该文件是机器本地的,已 gitignore):
+
+```bash
+brew install xcode-build-server   # 首次
+scripts/setup-lsp.sh              # 生成 buildServer.json 并指向仓库内 .build/DerivedData
+```
+
+之后 Reload Window 即可获得 App 源码与 SPM 包的完整补全/跳转/诊断。改 scheme 或工程结构后重跑一次。
+
 ## 状态
 
 开发中,当前里程碑见 [docs/PLAN.md](docs/PLAN.md)。
