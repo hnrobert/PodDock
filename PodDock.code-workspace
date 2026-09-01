@@ -52,5 +52,8 @@
         "preLaunchTask": "swift: Build Release poddock-capture (DNSPodKit (SPM))"
       }
     ]
+  },
+  "settings": {
+    "git.autoRepositoryDetection": false
   }
 }

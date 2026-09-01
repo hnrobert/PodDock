@@ -5,10 +5,11 @@ extension JSONValue {
   public init?(any: Any) {
     switch any {
     case is NSNull: self = .null
+    // `as Bool` matches only real JSON booleans on both platforms
+    // (Darwin CFBoolean / corelibs Bool) — never numeric NSNumbers
+    case let bool as Bool: self = .bool(bool)
     case let number as NSNumber:
-      if number.isBoolean {
-        self = .bool(number.boolValue)
-      } else if let int = Int64(exactly: number) {
+      if let int = Int64(exactly: number) {
         self = .int(Int(int))
       } else if let double = Double(exactly: number) {
         self = .double(double)
@@ -63,11 +64,5 @@ extension JSONValue {
   public var objectValue: [String: JSONValue]? {
     if case .object(let object) = self { return object }
     return nil
-  }
-}
-
-private extension NSNumber {
-  var isBoolean: Bool {
-    CFGetTypeID(self) == CFBooleanGetTypeID()
   }
 }

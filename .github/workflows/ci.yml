@@ -1,6 +1,6 @@
 name: CI
 
-# action 版本核查于 2026-08-30:checkout@v7 / setup-xcode@v1 / setup-swift@v2
+# Action versions verified on 2026-08-30: checkout@v7 / setup-xcode@v1 / setup-swift@v2
 on:
   push:
     branches: [main]
@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   macos:
-    name: macOS (App 双平台 build + Kit 测试)
+    name: macOS (app build on both platforms + Kit tests)
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v7
@@ -52,7 +52,7 @@ jobs:
         run: swift test
 
   linux:
-    name: Linux 纯净性 (Kit 测试 + poddock-mcp 构建)
+    name: Linux purity (Kit tests + poddock-mcp build)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
