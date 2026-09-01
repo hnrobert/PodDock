@@ -1,19 +1,14 @@
 name: Release
 
-# Tag-triggered packaging automation (modeled on MultiScreenCapturer, upgraded):
-# - macOS app: Developer ID signing + notarization + staple, arm64 only
-# - poddock-mcp: multi-arch Docker image pushed to GHCR
+# Tag-triggered packaging automation:
+# - macOS app: signed with your Apple Development certificate via keychain import
+#   (APPLE_CERTIFICATE_BASE64 / APPLE_CERTIFICATE_PASSWORD secrets), arm64 only.
+#   NOT notarized — notarytool requires a paid Apple Developer Program account.
+#   Recipients bypass Gatekeeper once (right-click → Open). Upgrade path in DEVELOPMENT.md.
+# - poddock-mcp: multi-arch Docker image pushed to GHCR (no secrets — GITHUB_TOKEN).
 #
 # Action versions verified on 2026-08-31: gh-release@v3 / login@v4 / metadata@v6 /
 # buildx@v4 / build-push@v7.
-#
-# Required secrets (how to obtain each one: docs/DEVELOPMENT.md):
-#   APPLE_CERTIFICATE_BASE64    — Developer ID Application certificate (.p12, base64)
-#   APPLE_CERTIFICATE_PASSWORD  — password of that .p12
-#   KEYCHAIN_PASSWORD           — password for the ephemeral CI keychain
-#   APPLE_ID                    — Apple ID used for notarization
-#   APPLE_APP_SPECIFIC_PASSWORD — app-specific password for that Apple ID
-#   APPLE_TEAM_ID               — team ID (10 chars) for signing and notarytool
 #
 # Usage: bump MARKETING_VERSION, commit, then `git tag v0.x.y && git push --tags`.
 
@@ -32,7 +27,7 @@ concurrency:
 
 jobs:
   app:
-    name: macOS app (Developer ID + notarized, arm64)
+    name: macOS app (certificate-signed zip, arm64)
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v7
@@ -42,7 +37,7 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - name: Import Developer ID certificate
+      - name: Set up signing
         env:
           APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
@@ -58,53 +53,38 @@ jobs:
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" build.keychain
           rm -f "$CERTFILE"
+          # Extract the team id from the imported identity (pbxproj has none baked in)
+          security find-identity -v -p codesigning build.keychain \
+            | grep -oE '\(([A-Z0-9]{10})\)' | head -1 | tr -d '()' > team_id.txt
+          echo "TEAM_ID=$(cat team_id.txt)" >> "$GITHUB_ENV"
 
-      - name: Archive and export app
-        env:
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      - name: Build and archive app
         run: |
           xcodebuild -project PodDock.xcodeproj -scheme PodDock \
             -configuration Release -destination "generic/platform=macOS" \
             -archivePath build/PodDock.xcarchive \
-            CODE_SIGN_STYLE=Manual \
-            CODE_SIGN_IDENTITY="Developer ID Application" \
-            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
-            OTHER_CODE_SIGN_FLAGS="--options runtime" \
             ARCHS=arm64 ONLY_ACTIVE_ARCH=YES \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_IDENTITY="Apple Development" \
             archive
-          xcodebuild -exportArchive \
-            -archivePath build/PodDock.xcarchive \
-            -exportPath build/export \
-            -exportOptionsPlist .github/exportOptions.plist
 
-      - name: Store notarytool credentials
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      - name: Package
         run: |
-          xcrun notarytool store-credentials PodDockNotary \
-            --apple-id "$APPLE_ID" \
-            --password "$APPLE_APP_SPECIFIC_PASSWORD" \
-            --team-id "$APPLE_TEAM_ID"
-
-      - name: Notarize and staple
-        run: |
-          APP="build/export/PodDock.app"
-          ditto -c -k --keepParent "$APP" build/PodDock.zip
-          # notarytool works on the zip; staple goes on the app bundle
-          xcrun notarytool submit build/PodDock.zip --keychain-profile PodDockNotary --wait
-          xcrun stapler staple "$APP"
-          # re-zip the stapled bundle so the download is Gatekeeper-ready
-          rm build/PodDock.zip
-          ditto -c -k --keepParent "$APP" build/PodDock-macOS-arm64.zip
+          # ditto (not zip) preserves symlinks and bundle structure
+          ditto -c -k --keepParent \
+            "build/PodDock.xcarchive/Products/Applications/PodDock.app" \
+            PodDock-macOS-arm64.zip
 
       - name: Attach to GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          files: build/PodDock-macOS-arm64.zip
+          files: PodDock-macOS-arm64.zip
           draft: true
           generate_release_notes: true
+          body: |
+            macOS (Apple Silicon), signed with an Apple Development certificate — not notarized.
+            On first launch macOS will block it: right-click the app → **Open** → **Open**,
+            or run `xattr -d com.apple.quarantine /Applications/PodDock.app`.
 
   mcp-image:
     name: poddock-mcp Docker image (GHCR)

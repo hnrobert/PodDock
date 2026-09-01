@@ -23,7 +23,7 @@ PodDock 是 DNSPod 的原生 SwiftUI 客户端,2026-08-30 立项,从 dnspod-api-
 | 工程 | Xcode 工程 + 本地 SPM 包;`@Observable` MV;URLSession 自封装零依赖 |
 | 测试 | swift-testing 单测(DNSPodKit)+ XCUITest 关键流程(UI 测试只能 XCTest) |
 | UI | 系统风 + 品牌绿;macOS 首屏即域名列表;危险操作确认框;定制豌豆荚图标 |
-| CI | 参考 MultiScreenCapturer 模式,但 action 版本升级、修正脆弱判定、补 notarization |
+| CI | GitHub Actions: macOS job(app 双平台 build + Kit 测试) + ubuntu job(Linux 纯净性); action 钉最新 major |
 | 其他 | README 与文档全英文;版本 0.1.0 起;远期:菜单栏、小组件+快捷指令、watchOS、CLI |
 
 传统 API 公共参数(官方文档已核实):`login_token`=`ID,Token`、`format=json`、`lang=cn`、`error_on_empty=no`;仅主账号;官方已标 legacy(适配层即对冲)。
@@ -177,7 +177,7 @@ protocol DNSPodClient: Sendable {
 
 ## CI / 交付
 
-参考 MultiScreenCapturer 模式:push/PR → `macos-latest` + `setup-xcode` latest-stable,免签名 build + test(双 destination),xcresult 上传并以 `xcresulttool get test-results summary` 判定(**不照抄** `|| true`+grep 的脆弱补丁);另加 **ubuntu job**:`swift test` + `swift build --product poddock-mcp`(锁 Linux 纯净性);tag `v*` → 签名 archive + zip + gh-release + notarization。**发布产物仅 arm64**(Apple Silicon,archive 按 `-arch arm64` 出包,不做 universal);poddock-mcp 视需要随 release 出 Docker 镜像或静态二进制(M3 时与 hnrobert-github-actions 访谈定)。action 升级:`checkout@v4+`、`upload-artifact@v4`、`setup-xcode@v1`、`action-gh-release@v2`。**写 workflow 前按 hnrobert-github-actions 规范做模板访谈**。
+push/PR → `macos-latest` + `setup-xcode` latest-stable,免签名 build + test(双 destination),xcresult 上传并以 `xcresulttool get test-results summary` 判定(**不照抄** `|| true`+grep 的脆弱补丁);另加 **ubuntu job**:`swift test` + `swift build --product poddock-mcp`(锁 Linux 纯净性);tag `v*` → 证书导入 + 签名 archive + `ditto` zip + gh-release(draft),MCP 多架构镜像推 GHCR;**发布产物仅 arm64**(Apple Silicon,不做 universal);无付费开发者账号 → 不做公证,收件人右键打开,升级路径见根目录 DEVELOPMENT.md。action 钉最新 major(`checkout@v7`、`gh-release@v3`、`login@v4`、`metadata@v6`、`buildx@v4`、`build-push@v7`),版本核查日期 2026-08-31。
 
 ## 风险与对策
 
