@@ -204,10 +204,11 @@ struct OpenAICompatClient: LLMProviding {
 
     func flushAssistant() {
       guard !pendingToolCalls.isEmpty || !textParts.isEmpty else { return }
-      var encoded: [String: Any] = [
-        "role": "assistant",
-        "content": textParts.joined(separator: "\n").isEmpty ? nil : textParts.joined(separator: "\n"),
-      ]
+      var encoded: [String: Any] = ["role": "assistant"]
+      let joined = textParts.joined(separator: "\n")
+      if !joined.isEmpty {
+        encoded["content"] = joined
+      }
       if !pendingToolCalls.isEmpty {
         encoded["tool_calls"] = pendingToolCalls
       }

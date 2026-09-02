@@ -1,8 +1,9 @@
 // !$*UTF8*$!
 {
 	archiveVersion = 1;
-	objectVersion = 77;
-	objectCount = 18;
+	classes = {
+	};
+	objectVersion = 100;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -10,19 +11,26 @@
 		888888888888888888888889 /* PodDockMCP in Frameworks */ = {isa = PBXBuildFile; productRef = 777777777777777777777778 /* PodDockMCP */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		BBBBBBBBBBBBBBBBBBBBBBBB /* PodDock */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = PodDock; sourceTree = "<group>"; };
-/* End PBXFileSystemSynchronizedRootGroup section */
-
 /* Begin PBXFileReference section */
 		333333333333333333333333 /* PodDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PodDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		BBBBBBBBBBBBBBBBBBBBBBBB /* PodDock */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PodDock;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
-		999999999999999999999992 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (
+		999999999999999999999992 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
 				888888888888888888888888 /* DNSPodKit in Frameworks */,
 				888888888888888888888889 /* PodDockMCP in Frameworks */,
-			); runOnlyForDeploymentPostprocessing = 0; };
+			);
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -55,8 +63,6 @@
 			);
 			buildRules = (
 			);
-			dependencies = (
-			);
 			fileSystemSynchronizedGroups = (
 				BBBBBBBBBBBBBBBBBBBBBBBB /* PodDock */,
 			);
@@ -75,9 +81,10 @@
 		111111111111111111111111 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				BuildIndependentTargetsOnly = 1;
 				LastSwiftUpdateCheck = 1600;
-				LastUpgradeCheck = 1600;
+				LastUpgradeCheck = 2660;
 				TargetAttributes = {
 					222222222222222222222222 = {
 						CreatedOnToolsVersion = 16.0;
@@ -85,10 +92,6 @@
 				};
 			};
 			buildConfigurationList = AAAAAAAAAAAAAAAAAAAAAA00 /* Build configuration list for PBXProject "PodDock" */;
-			packageReferences = (
-				666666666666666666666666 /* XCLocalSwiftPackageReference "DNSPodKit" */,
-			);
-			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -98,7 +101,10 @@
 			);
 			mainGroup = 444444444444444444444444;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
+			packageReferences = (
+				666666666666666666666666 /* XCLocalSwiftPackageReference "DNSPodKit" */,
+			);
+			preferredProjectObjectVersion = 100;
 			productRefGroup = 555555555555555555555555 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -109,24 +115,28 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		999999999999999999999993 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (
-			); runOnlyForDeploymentPostprocessing = 0; };
+		999999999999999999999993 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		999999999999999999999991 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (
-			); runOnlyForDeploymentPostprocessing = 0; };
+		999999999999999999999991 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXVariantGroup section */
-/* End PBXVariantGroup section */
-
 /* Begin XCBuildConfiguration section */
-		AAAAAAAAAAAAAAAAAAAAAA01 /* Debug */ = {
+		AAAAAAAAAAAAAAAAAAAAAA01 /* Debug configuration for PBXProject "PodDock" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -156,7 +166,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 8RY46C6B44;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -178,16 +190,18 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
-		AAAAAAAAAAAAAAAAAAAAAA02 /* Release */ = {
+		AAAAAAAAAAAAAAAAAAAAAA02 /* Release configuration for PBXProject "PodDock" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -217,7 +231,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 8RY46C6B44;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -232,20 +248,24 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		AAAAAAAAAAAAAAAAAAAAAA04 /* Debug */ = {
+		AAAAAAAAAAAAAAAAAAAAAA04 /* Debug configuration for PBXNativeTarget "PodDock" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = Config/PodDock.macOS.entitlements;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = Config/PodDock.macOS.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = PodDock;
@@ -257,8 +277,9 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.robert.poddock";
+				PRODUCT_BUNDLE_IDENTIFIER = com.hnrobert.poddock;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
 				SUPPORTED_DESTINATIONS = "macOS,iOS";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -268,15 +289,18 @@
 			};
 			name = Debug;
 		};
-		AAAAAAAAAAAAAAAAAAAAAA05 /* Release */ = {
+		AAAAAAAAAAAAAAAAAAAAAA05 /* Release configuration for PBXNativeTarget "PodDock" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = Config/PodDock.macOS.entitlements;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = Config/PodDock.macOS.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = PodDock;
@@ -288,8 +312,9 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.robert.poddock";
+				PRODUCT_BUNDLE_IDENTIFIER = com.hnrobert.poddock;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
 				SUPPORTED_DESTINATIONS = "macOS,iOS";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -305,30 +330,37 @@
 		AAAAAAAAAAAAAAAAAAAAAA00 /* Build configuration list for PBXProject "PodDock" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				AAAAAAAAAAAAAAAAAAAAAA01 /* Debug */,
-				AAAAAAAAAAAAAAAAAAAAAA02 /* Release */,
+				AAAAAAAAAAAAAAAAAAAAAA01 /* Debug configuration for PBXProject "PodDock" */,
+				AAAAAAAAAAAAAAAAAAAAAA02 /* Release configuration for PBXProject "PodDock" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		AAAAAAAAAAAAAAAAAAAAAA03 /* Build configuration list for PBXNativeTarget "PodDock" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				AAAAAAAAAAAAAAAAAAAAAA04 /* Debug */,
-				AAAAAAAAAAAAAAAAAAAAAA05 /* Release */,
+				AAAAAAAAAAAAAAAAAAAAAA04 /* Debug configuration for PBXNativeTarget "PodDock" */,
+				AAAAAAAAAAAAAAAAAAAAAA05 /* Release configuration for PBXNativeTarget "PodDock" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		666666666666666666666666 /* XCLocalSwiftPackageReference "DNSPodKit" */ = {isa = XCLocalSwiftPackageReference; relativePath = DNSPodKit; };
+		666666666666666666666666 /* XCLocalSwiftPackageReference "DNSPodKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = DNSPodKit;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		777777777777777777777777 /* DNSPodKit */ = {isa = XCSwiftPackageProductDependency; productName = DNSPodKit; };
-		777777777777777777777778 /* PodDockMCP */ = {isa = XCSwiftPackageProductDependency; productName = PodDockMCP; };
+		777777777777777777777777 /* DNSPodKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DNSPodKit;
+		};
+		777777777777777777777778 /* PodDockMCP */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PodDockMCP;
+		};
 /* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 111111111111111111111111 /* Project object */;
