@@ -10,6 +10,8 @@ final class RecordListModel {
     case byName
     case byType
     case byTTL
+    case byAdded
+    case byWeight
 
     var id: String { rawValue }
 
@@ -18,6 +20,8 @@ final class RecordListModel {
       case .byName: String(localized: "By Name")
       case .byType: String(localized: "By Type")
       case .byTTL: String(localized: "By TTL")
+      case .byAdded: String(localized: "By Added Time")
+      case .byWeight: String(localized: "By Weight")
       }
     }
   }
@@ -64,6 +68,18 @@ final class RecordListModel {
     case .byName: result.sort { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     case .byType: result.sort { ($0.type, $0.name) < ($1.type, $1.name) }
     case .byTTL: result.sort { ($0.ttl, $0.name) < ($1.ttl, $1.name) }
+    // DNSPod assigns record ids sequentially, so numeric id order ≈ creation order
+    // (Record.List exposes no created_on; only updated_on)
+    case .byAdded: result.sort { (UInt64($0.id.rawValue) ?? 0, $0.name) < (UInt64($1.id.rawValue) ?? 0, $1.name) }
+    // Higher weight first; unset (nil) weights sink to the bottom
+    case .byWeight: result.sort { lhs, rhs in
+      switch (lhs.weight, rhs.weight) {
+      case let (l?, r?): l > r || (l == r && lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending)
+      case (_?, nil): true
+      case (nil, _?): false
+      case (nil, nil): lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
+      }
+    }
     }
     return result
   }
