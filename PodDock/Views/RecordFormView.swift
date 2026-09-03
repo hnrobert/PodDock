@@ -23,6 +23,7 @@ struct RecordFormView: View {
   @State private var value = ""
   @State private var mxText = "10"
   @State private var ttlText = "600"
+  @State private var weightText = ""
   @State private var remark = ""
 
   @State private var options: RecordOptions?
@@ -79,6 +80,9 @@ struct RecordFormView: View {
           }
           LabeledContent("TTL (seconds)") {
             TextField("", text: $ttlText, prompt: Text("600"))
+          }
+          LabeledContent("Weight (0–100)") {
+            TextField("", text: $weightText, prompt: Text("Optional, load balancing"))
           }
         }
 
@@ -139,6 +143,7 @@ struct RecordFormView: View {
     if recordType == "A", !Self.isIPv4(trimmedValue) { return false }
     if Int(ttlText) == nil { return false }
     if recordType == "MX", Int(mxText) == nil { return false }
+    if !weightText.isEmpty, !(0...100).contains(Int(weightText) ?? -1) { return false }
     return true
   }
 
@@ -150,6 +155,9 @@ struct RecordFormView: View {
     value = original.value
     mxText = String(original.mx)
     ttlText = String(original.ttl)
+    if let weight = original.weight {
+      weightText = String(weight)
+    }
     remark = original.remark
   }
 
@@ -185,7 +193,8 @@ struct RecordFormView: View {
         value: value.trimmingCharacters(in: .whitespaces),
         mx: Int(mxText),
         ttl: Int(ttlText),
-        remark: remark)
+        remark: remark,
+        weight: weightText.isEmpty ? nil : Int(weightText))
 
       do {
         if let original {

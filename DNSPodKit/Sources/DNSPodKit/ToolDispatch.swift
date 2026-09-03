@@ -96,7 +96,8 @@ public enum ToolDispatch {
         value: try string("value"),
         mx: optionalInt("mx"),
         ttl: optionalInt("ttl"),
-        remark: arguments["remark"]?.stringValue ?? "")
+        remark: arguments["remark"]?.stringValue ?? "",
+        weight: optionalInt("weight"))
       let recordID = try await client.createRecord(draft, in: domain)
       return "Record \(recordID.rawValue) created (\(draft.subDomain) \(draft.recordType) → \(draft.value))."
 
@@ -114,7 +115,8 @@ public enum ToolDispatch {
         value: try string("value"),
         mx: optionalInt("mx"),
         ttl: optionalInt("ttl"),
-        remark: arguments["remark"]?.stringValue ?? original.remark)
+        remark: arguments["remark"]?.stringValue ?? original.remark,
+        weight: optionalInt("weight"))
       try await client.updateRecord(id: RecordID(recordID), in: domain, from: original, to: draft)
       return "Record \(recordID) updated."
 

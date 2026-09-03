@@ -113,15 +113,7 @@ public struct LegacyClient: DNSPodClient {
   public func createRecord(_ draft: RecordDraft, in domain: DNSDomain) async throws -> RecordID {
     let response: RecordCreateResponse = try await call(
       "Record.Create",
-      [
-        "domain_id": domain.id.rawValue,
-        "sub_domain": draft.subDomain,
-        "record_type": draft.recordType,
-        "record_line": draft.recordLine,
-        "value": draft.value,
-        "mx": String(draft.mx),
-        "ttl": String(draft.ttl),
-      ])
+      Self.recordFields(for: draft, domainID: domain.id.rawValue))
     guard let rawID = response.record?.id?.value, !rawID.isEmpty else {
       throw DNSPodError.invalidResponse("Record.Create 未返回 record.id")
     }
@@ -141,18 +133,9 @@ public struct LegacyClient: DNSPodClient {
   public func updateRecord(
     id: RecordID, in domain: DNSDomain, from original: DNSRecord, to draft: RecordDraft
   ) async throws {
-    let _: StatusOnlyResponse = try await call(
-      "Record.Modify",
-      [
-        "domain_id": domain.id.rawValue,
-        "record_id": id.rawValue,
-        "sub_domain": draft.subDomain,
-        "record_type": draft.recordType,
-        "record_line": draft.recordLine,
-        "value": draft.value,
-        "mx": String(draft.mx),
-        "ttl": String(draft.ttl),
-      ])
+    var fields = Self.recordFields(for: draft, domainID: domain.id.rawValue)
+    fields["record_id"] = id.rawValue
+    let _: StatusOnlyResponse = try await call("Record.Modify", fields)
 
     // Reference app: only calls it when remark != oremark
     if draft.remark != original.remark {
@@ -186,6 +169,24 @@ public struct LegacyClient: DNSPodClient {
   }
 
   // MARK: - Low-level call
+
+  /// Shared Create/Modify wire fields; weight only goes on the wire when set
+  /// (nil keeps the server default on create / the existing value on modify)
+  static func recordFields(for draft: RecordDraft, domainID: String) -> [String: String] {
+    var fields: [String: String] = [
+      "domain_id": domainID,
+      "sub_domain": draft.subDomain,
+      "record_type": draft.recordType,
+      "record_line": draft.recordLine,
+      "value": draft.value,
+      "mx": String(draft.mx),
+      "ttl": String(draft.ttl),
+    ]
+    if let weight = draft.weight {
+      fields["weight"] = String(weight)
+    }
+    return fields
+  }
 
   /// Debug/fixture capture: returns the raw body after the envelope check.
   /// Lets poddock-capture record real responses into Tests/DNSPodKitTests/Fixtures/.

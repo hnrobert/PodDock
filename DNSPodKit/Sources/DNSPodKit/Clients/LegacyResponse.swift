@@ -95,9 +95,11 @@ struct LegacyRecordDTO: Codable {
   let mx: FlexInt?
   let ttl: FlexInt?
   let remark: String?
+  /// Load-balancing weight, nullable in Record.List responses (undocumented in the field table)
+  let weight: FlexInt?
 
   enum CodingKeys: String, CodingKey {
-    case id, name, type, line, value, enabled, mx, ttl, remark
+    case id, name, type, line, value, enabled, mx, ttl, remark, weight
     case subDomain = "sub_domain"
     case recordType = "record_type"
     case recordLine = "record_line"
@@ -113,7 +115,8 @@ struct LegacyRecordDTO: Codable {
       isEnabled: enabled?.value ?? false,
       mx: mx?.value ?? 10,
       ttl: ttl?.value ?? 600,
-      remark: remark ?? ""
+      remark: remark ?? "",
+      weight: weight?.value
     )
   }
 }

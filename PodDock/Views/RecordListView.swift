@@ -248,6 +248,9 @@ private struct RecordRowView: View {
       Spacer()
       VStack(alignment: .trailing, spacing: 2) {
         Text("TTL \(record.ttl)").font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+        if let weight = record.weight {
+          Text("W \(weight)").font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+        }
         if record.type == "MX" {
           Text("MX \(record.mx)").font(.caption.monospacedDigit()).foregroundStyle(.secondary)
         }

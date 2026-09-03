@@ -361,3 +361,51 @@ struct LegacyClientTests {
     #expect(lineFields["domain_grade"] == "DP_Free")
   }
 }
+
+@Suite("Weight wire format")
+struct WeightTests {
+  static let tokenID = "12345"
+  static let tokenKey = "abc"
+
+  @Test("weight goes on the wire when set, absent when nil")
+  func weightWire() async throws {
+    let mock = MockTransport()
+    await mock.enqueue(ok: Fixtures.recordCreate)
+    await mock.enqueue(ok: Fixtures.ok)
+    let client = LegacyClient(tokenID: Self.tokenID, tokenKey: Self.tokenKey, transport: mock)
+
+    let domain = DNSDomain(
+      id: DomainID("2317346"), name: "example.com", grade: "DP_Free",
+      state: .enable, recordCount: 0, updatedOn: "")
+    _ = try await client.createRecord(
+      RecordDraft(subDomain: "www", recordType: "A", recordLine: "默认", value: "1.2.3.4", weight: 30),
+      in: domain)
+    let create = await mock.recordedFormBodies()[0]
+    #expect(create["weight"] == "30")
+
+    let mock2 = MockTransport()
+    await mock2.enqueue(ok: Fixtures.recordCreate)
+    let client2 = LegacyClient(tokenID: Self.tokenID, tokenKey: Self.tokenKey, transport: mock2)
+    _ = try await client2.createRecord(
+      RecordDraft(subDomain: "www", recordType: "A", recordLine: "默认", value: "1.2.3.4"),
+      in: domain)
+    let create2 = await mock2.recordedFormBodies()[0]
+    #expect(create2["weight"] == nil)
+
+    // modify keeps weight when the draft doesn't set one
+    let mock3 = MockTransport()
+    await mock3.enqueue(ok: Fixtures.ok)
+    let client3 = LegacyClient(tokenID: Self.tokenID, tokenKey: Self.tokenKey, transport: mock3)
+    let original = DNSRecord(
+      id: RecordID("154169992"), name: "www", type: "A", line: "默认", value: "1.2.3.4",
+      isEnabled: true, mx: 0, ttl: 600, remark: "", weight: 30)
+    try await client3.updateRecord(
+      id: original.id, in: domain, from: original,
+      to: RecordDraft(subDomain: "www", recordType: "A", recordLine: "默认", value: "5.6.7.8"))
+    let modify = await mock3.recordedFormBodies()[0]
+    #expect(modify["weight"] == nil)
+
+    // Record.List: null weight decodes to nil, numeric string decodes
+    #expect(try JSONDecoder().decode(RecordListResponse.self, from: Data(Fixtures.recordList.utf8)).records?[0].weight == nil)
+  }
+}

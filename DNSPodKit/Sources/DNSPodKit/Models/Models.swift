@@ -94,10 +94,13 @@ public struct DNSRecord: Hashable, Sendable, Identifiable {
   public let mx: Int
   public let ttl: Int
   public let remark: String
+  /// Load-balancing weight (0–100, same name+type records share traffic by it);
+  /// nil = absent/unset (the field is nullable in Record.List responses)
+  public let weight: Int?
 
   public init(
     id: RecordID, name: String, type: String, line: String, value: String,
-    isEnabled: Bool, mx: Int, ttl: Int, remark: String
+    isEnabled: Bool, mx: Int, ttl: Int, remark: String, weight: Int? = nil
   ) {
     self.id = id
     self.name = name
@@ -108,6 +111,7 @@ public struct DNSRecord: Hashable, Sendable, Identifiable {
     self.mx = mx
     self.ttl = ttl
     self.remark = remark
+    self.weight = weight
   }
 
   public static func == (lhs: DNSRecord, rhs: DNSRecord) -> Bool { lhs.id == rhs.id }
@@ -123,6 +127,9 @@ public struct RecordDraft: Hashable, Sendable {
   public var mx: Int
   public var ttl: Int
   public var remark: String
+  /// Load-balancing weight (0–100). nil = don't touch the wire field
+  /// (create: server default; modify: keep the existing value)
+  public var weight: Int?
 
   public init(
     subDomain: String = "@",
@@ -131,7 +138,8 @@ public struct RecordDraft: Hashable, Sendable {
     value: String,
     mx: Int? = nil,
     ttl: Int? = nil,
-    remark: String = ""
+    remark: String = "",
+    weight: Int? = nil
   ) {
     self.subDomain = subDomain.isEmpty ? "@" : subDomain
     self.recordType = recordType
@@ -141,6 +149,7 @@ public struct RecordDraft: Hashable, Sendable {
     self.mx = mx ?? 10
     self.ttl = ttl ?? 600
     self.remark = remark
+    self.weight = weight
   }
 }
 
