@@ -15,7 +15,7 @@ struct AddAccountView: View {
 
   var body: some View {
     VStack(spacing: 24) {
-      Image(systemName: "dock.rectangle.fill")
+      Image(systemName: "dock.rectangle")
         .font(.system(size: 56))
         .foregroundStyle(.green)
 
