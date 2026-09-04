@@ -1,14 +1,22 @@
 import SwiftUI
 import DNSPodKit
 
-/// DoH propagation check: multiple providers with system fallback (labeled source).
+/// Fixed check target: hostname + record type come from the record that launched the panel.
+struct DoHTarget: Identifiable {
+  let hostname: String
+  let recordType: String
+
+  var id: String { "\(recordType)/\(hostname)" }
+}
+
+/// DoH propagation check. The target is fixed by the source record; the only
+/// choice is the provider. Query runs on open and again when the provider changes.
 struct DoHPanelView: View {
-  @Environment(AppEnvironment.self) private var environment
   @Environment(\.dismiss) private var dismiss
 
-  @State var initialName: String
-  @State private var recordType = "A"
+  let target: DoHTarget
   @State private var provider: DoHProvider = .aliyun
+  @State private var runID = UUID()
   @State private var isRunning = false
   @State private var result: DoHResult?
   @State private var errorMessage: String?
@@ -17,26 +25,26 @@ struct DoHPanelView: View {
     VStack(spacing: 16) {
       Text("Propagation Check").font(.headline)
 
-      Form {
-        TextField("Hostname", text: $initialName, prompt: Text("Full hostname, e.g. www.example.com"))
-          .textFieldStyle(.roundedBorder)
-          .onSubmit(run)
-        HStack {
-          Picker("Record Type", selection: $recordType) {
-            ForEach(["A", "AAAA", "CNAME", "MX", "TXT"], id: \.self) { Text($0) }
-          }
-          .frame(maxWidth: 120)
-          Picker("Provider", selection: $provider) {
-            ForEach(DoHProvider.allCases) { provider in
-              Text(provider.displayName).tag(provider)
-            }
-          }
-          .frame(maxWidth: 160)
-        }
+      // Read-only target context — the record the user right-clicked
+      HStack(spacing: 10) {
+        Text(target.hostname)
+          .font(.system(.title3, design: .monospaced))
+          .textSelection(.enabled)
+        Text(target.recordType)
+          .font(.caption.weight(.semibold))
+          .padding(.horizontal, 8)
+          .padding(.vertical, 3)
+          .background(.quaternary, in: Capsule())
       }
-      .frame(maxWidth: 420)
 
       HStack {
+        Picker("Provider", selection: $provider) {
+          ForEach(DoHProvider.allCases) { provider in
+            Text(provider.displayName).tag(provider)
+          }
+        }
+        .frame(maxWidth: 180)
+
         Button {
           run()
         } label: {
@@ -47,7 +55,7 @@ struct DoHPanelView: View {
           }
         }
         .buttonStyle(.borderedProminent)
-        .disabled(initialName.isEmpty || isRunning)
+        .disabled(isRunning)
         Button("Done") { dismiss() }
       }
 
@@ -86,20 +94,31 @@ struct DoHPanelView: View {
       Spacer()
     }
     .padding(24)
-    .frame(minWidth: 520, minHeight: 440)
+    .frame(minWidth: 520, minHeight: 400)
+    .task { run() }
+    .onChange(of: provider) { _, _ in run() }
   }
 
+  /// Runs a query; stale completions (provider switched mid-flight) no-op via runID,
+  /// so they never overwrite the latest run's state or clear its spinner.
   private func run() {
+    let id = UUID()
+    runID = id
+    isRunning = true
+    result = nil
+    errorMessage = nil
+    let resolver = DoHResolver(provider: provider)
     Task {
-      isRunning = true
-      defer { isRunning = false }
-      result = nil
-      errorMessage = nil
-      let resolver = DoHResolver(provider: provider)
       do {
-        result = try await resolver.resolveWithFallback(name: initialName, recordType: recordType)
+        let outcome = try await resolver.resolveWithFallback(
+          name: target.hostname, recordType: target.recordType)
+        guard runID == id else { return }
+        result = outcome
+        isRunning = false
       } catch {
+        guard runID == id else { return }
         errorMessage = describeError(error)
+        isRunning = false
       }
     }
   }

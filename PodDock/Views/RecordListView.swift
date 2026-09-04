@@ -14,9 +14,8 @@ struct RecordListView: View {
   @State private var editingRecord: DNSRecord?
   @State private var remarkRecord: DNSRecord?
   @State private var remarkDraft = ""
-  @State private var isShowingDoH = false
   @State private var isShowingAssistant = false
-  @State private var doHName = ""
+  @State private var doHTarget: DoHTarget?
   @State private var pendingDelete: DNSRecord?
   @State private var pendingBatchDelete: [DNSRecord]?
 
@@ -42,8 +41,8 @@ struct RecordListView: View {
       .sheet(item: $remarkRecord) { record in
         remarkSheet(record)
       }
-      .sheet(isPresented: $isShowingDoH) {
-        DoHPanelView(initialName: doHName)
+      .sheet(item: $doHTarget) { target in
+        DoHPanelView(target: target)
       }
       .sheet(isPresented: $isShowingAssistant) {
         AssistantView()
@@ -105,10 +104,10 @@ struct RecordListView: View {
       }
       Divider()
       Button("Check via DoH") {
-        doHName = record.name == "@"
+        let hostname = record.name == "@"
           ? model.domain?.name ?? domain.name
           : "\(record.name).\(domain.name)"
-        isShowingDoH = true
+        doHTarget = DoHTarget(hostname: hostname, recordType: record.type)
       }
       Button("Remove…", role: .destructive) { pendingDelete = record }
     }
