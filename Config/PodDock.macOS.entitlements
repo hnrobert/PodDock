@@ -2,9 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>com.apple.security.app-sandbox</key>
-	<true/>
-	<key>com.apple.security.network.client</key>
-	<true/>
+	<!-- No sandbox: we distribute via Developer ID (not Mac App Store), and the
+	     sandbox's keychain access control scopes items to the signing identity,
+	     which changes on every Xcode rebuild — losing saved accounts in dev.
+	     Network access works without entitlements when not sandboxed. -->
 </dict>
 </plist>

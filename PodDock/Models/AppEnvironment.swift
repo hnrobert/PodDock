@@ -50,7 +50,13 @@ final class AppEnvironment {
       }
     #endif
 
-    self.accountStore = accountStore ?? KeychainAccountStore()
+    #if os(macOS)
+      // macOS: file store — the keychain scopes items by code-signing identity,
+      // which changes every Xcode rebuild and loses accounts between debug sessions
+      self.accountStore = accountStore ?? FileAccountStore()
+    #else
+      self.accountStore = accountStore ?? KeychainAccountStore()
+    #endif
     domains = DomainListModel()
     domains.attach(environment: self)
   }

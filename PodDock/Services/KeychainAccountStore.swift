@@ -5,10 +5,13 @@ import DNSPodKit
 /// Keychain account store (the Security framework is Apple-only, hence App target, not Kit).
 ///
 /// One generic password per account: account = UUID (not the Token ID, so labels can change),
-/// value = Account JSON. Prefers the Data Protection Keychain (`kSecUseDataProtectionKeychain
-/// = true`, matching iOS); but when the process lacks entitlement context (macOS -34018
-/// errSecMissingEntitlement — typical: a bare binary launched from a debugger, ad-hoc signing with no team),
-/// Falls back to the file keychain and remembers the mode, keeping dev environments usable.
+/// value = Account JSON.
+///
+/// macOS: always the file (login) keychain — `kSecUseDataProtectionKeychain` on sandboxed
+/// macOS with dev-team signing scopes items into an access group derived from the signing
+/// identity, which changes between builds and loses items. The file keychain has no such
+/// dependency and persists reliably across debug/release/ad-hoc launches.
+/// iOS: always DataProtection (the flag is macOS-only anyway).
 final class KeychainError: LocalizedError {
   let status: OSStatus
   init(status: OSStatus) { self.status = status }
@@ -17,22 +20,27 @@ final class KeychainError: LocalizedError {
   }
 }
 
-final class KeychainAccountStore: AccountStoring, @unchecked Sendable {
+final class KeychainAccountStore: AccountStoring, Sendable {
   let service: String
-  private let lock = NSLock()
-  /// Set false once an entitlement context is found missing; later calls go straight to the file keychain
-  private var useDataProtection = true
 
   init(service: String = "com.robert.poddock.account") {
     self.service = service
   }
 
-  private func baseQuery(id: UUID? = nil, dataProtection: Bool) -> [String: Any] {
+  // MARK: - Query building
+
+  #if os(macOS)
+    private static let useDataProtection = false
+  #else
+    private static let useDataProtection = true
+  #endif
+
+  private func baseQuery(id: UUID? = nil) -> [String: Any] {
     var query: [String: Any] = [
       kSecClass as String: kSecClassGenericPassword,
       kSecAttrService as String: service,
     ]
-    if dataProtection {
+    if Self.useDataProtection {
       query[kSecUseDataProtectionKeychain as String] = true
     }
     if let id {
@@ -41,107 +49,63 @@ final class KeychainAccountStore: AccountStoring, @unchecked Sendable {
     return query
   }
 
-  /// Run in a specific keychain mode; on -34018 (missing entitlement) flag the global fallback
-  private func performIn(_ dataProtection: Bool, _ operation: (Bool) -> OSStatus) -> OSStatus {
-    let status = operation(dataProtection)
-    if status == errSecMissingEntitlement && dataProtection {
-      lock.lock()
-      useDataProtection = false
-      lock.unlock()
-    }
-    return status
-  }
-
-  /// Write path: run in the preferred mode, auto-retry on -34018
-  private func perform(_ operation: (Bool) -> OSStatus) throws {
-    lock.lock()
-    let preferDataProtection = useDataProtection
-    lock.unlock()
-
-    var status = performIn(preferDataProtection, operation)
-    if status == errSecMissingEntitlement, preferDataProtection {
-      status = performIn(false, operation)
-    }
-    guard status == errSecSuccess || status == errSecItemNotFound else {
-      throw KeychainError(status: status)
-    }
-  }
-
-  // MARK: - Sync implementation (SecItem ops are tiny, no blocking risk)
+  // MARK: - Sync implementation
 
   private func saveSync(_ account: Account) throws {
     let data = try JSONEncoder().encode(account)
+    let attributes: [String: Any] = [
+      kSecValueData as String: data,
+      kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+    ]
 
-    try perform { dataProtection in
-      let attributes: [String: Any] = [
-        kSecValueData as String: data,
-        kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
-      ]
-      var addQuery = baseQuery(id: account.id, dataProtection: dataProtection)
-      for (key, value) in attributes {
-        addQuery[key] = value
-      }
-      let addStatus = SecItemAdd(addQuery as CFDictionary, nil)
-      if addStatus == errSecDuplicateItem {
-        return SecItemUpdate(
-          baseQuery(id: account.id, dataProtection: dataProtection) as CFDictionary,
-          attributes as CFDictionary)
-      }
-      return addStatus
+    var addQuery = baseQuery(id: account.id)
+    for (key, value) in attributes {
+      addQuery[key] = value
+    }
+    let addStatus = SecItemAdd(addQuery as CFDictionary, nil)
+    if addStatus == errSecDuplicateItem {
+      let updateStatus = SecItemUpdate(
+        baseQuery(id: account.id) as CFDictionary,
+        attributes as CFDictionary)
+      guard updateStatus == errSecSuccess else { throw KeychainError(status: updateStatus) }
+    } else if addStatus != errSecSuccess {
+      throw KeychainError(status: addStatus)
     }
   }
 
   private func accountSync(id: UUID) -> Account? {
-    // Read both modes: an account may live in either keychain (e.g. a debug session wrote the file keychain)
-    for dataProtection in [true, false] {
-      var result: Account?
-      _ = performIn(dataProtection) { dp in
-        var query = baseQuery(id: id, dataProtection: dp)
-        query[kSecReturnAttributes as String] = true
-        query[kSecReturnData as String] = true
-        query[kSecMatchLimit as String] = kSecMatchLimitOne
-
-        var item: CFTypeRef?
-        let status = SecItemCopyMatching(query as CFDictionary, &item)
-        guard status == errSecSuccess, let dict = item as? [String: Any],
-          let data = dict[kSecValueData as String] as? Data
-        else { return status }
-        result = try? JSONDecoder().decode(Account.self, from: data)
-        return errSecSuccess
-      }
-      if result != nil { return result }
-    }
-    return nil
+    var query = baseQuery(id: id)
+    query[kSecReturnData as String] = true
+    query[kSecMatchLimit as String] = kSecMatchLimitOne
+    var item: CFTypeRef?
+    let status = SecItemCopyMatching(query as CFDictionary, &item)
+    guard status == errSecSuccess,
+      let dict = item as? [String: Any],
+      let data = dict[kSecValueData as String] as? Data
+    else { return nil }
+    return try? JSONDecoder().decode(Account.self, from: data)
   }
 
   private func accountsSync() -> [Account] {
-    // Read both modes and merge by UUID (an account may exist on only one side)
-    var merged: [UUID: Account] = [:]
-    for dataProtection in [true, false] {
-      _ = performIn(dataProtection) { dp in
-        var query = baseQuery(dataProtection: dp)
-        query[kSecReturnAttributes as String] = true
-        query[kSecReturnData as String] = true
-        query[kSecMatchLimit as String] = kSecMatchLimitAll
-
-        var items: CFTypeRef?
-        let status = SecItemCopyMatching(query as CFDictionary, &items)
-        guard status == errSecSuccess, let array = items as? [[String: Any]] else { return status }
-        for dict in array {
-          guard let data = dict[kSecValueData as String] as? Data,
-            let account = try? JSONDecoder().decode(Account.self, from: data)
-          else { continue }
-          merged[account.id] = account
-        }
-        return errSecSuccess
-      }
+    var query = baseQuery()
+    query[kSecReturnData as String] = true
+    query[kSecMatchLimit as String] = kSecMatchLimitAll
+    var items: CFTypeRef?
+    let status = SecItemCopyMatching(query as CFDictionary, &items)
+    guard status == errSecSuccess,
+      let array = items as? [[String: Any]]
+    else { return [] }
+    return array.compactMap { dict in
+      guard let data = dict[kSecValueData as String] as? Data else { return nil }
+      return try? JSONDecoder().decode(Account.self, from: data)
     }
-    return merged.values.sorted { $0.createdAt < $1.createdAt }
+    .sorted { $0.createdAt < $1.createdAt }
   }
 
   private func removeSync(id: UUID) throws {
-    try perform { dataProtection in
-      SecItemDelete(baseQuery(id: id, dataProtection: dataProtection) as CFDictionary)
+    let status = SecItemDelete(baseQuery(id: id) as CFDictionary)
+    guard status == errSecSuccess || status == errSecItemNotFound else {
+      throw KeychainError(status: status)
     }
   }
 
