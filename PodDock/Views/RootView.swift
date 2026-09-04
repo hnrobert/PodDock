@@ -1,13 +1,21 @@
 import SwiftUI
 import DNSPodKit
 
-/// Root routing: lock → no account (add one) → main UI
+/// Root routing: bootstrapping (splash) → lock → no account (add one) → main UI
 struct RootView: View {
   @Environment(AppEnvironment.self) private var environment
 
   var body: some View {
     Group {
-      if environment.lock.isLocked {
+      if environment.isBootstrapping {
+        VStack(spacing: 12) {
+          Image(systemName: "dock.rectangle")
+            .font(.system(size: 40))
+            .foregroundStyle(.green)
+          ProgressView()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+      } else if environment.lock.isLocked {
         AppLockView()
       } else if environment.accounts.isEmpty {
         AddAccountView()

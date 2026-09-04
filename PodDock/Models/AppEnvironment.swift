@@ -16,6 +16,9 @@ final class AppEnvironment {
 
   private(set) var accounts: [Account] = []
   private(set) var client: DNSPodClient?
+  /// True until bootstrap() finishes loading accounts — gates the root view
+  /// so the Add Account screen never flashes before saved accounts appear
+  private(set) var isBootstrapping = true
 
   /// Non-blocking feedback for current-account operations (errors / partial success)
   var latestMessage: String?
@@ -61,17 +64,26 @@ final class AppEnvironment {
     domains.attach(environment: self)
   }
 
-  /// Bootstrap: load accounts → restore the current one → fetch domains
+  /// Bootstrap: load accounts → restore the current one → fetch domains.
+  /// The UI gate (`isBootstrapping`) drops as soon as accounts are known,
+  /// so the Add Account screen never flashes for returning users.
   func bootstrap() async {
     domains.attach(environment: self)
     assistant.attach(environment: self)
     mcpHost.attach(environment: self)
     if isMockMode {
       // Mock mode: client injected in init (activate would overwrite it with a real one)
+      isBootstrapping = false
       await domains.load()
       return
     }
+
+    // Phase 1: load saved accounts (fast — file read) and flip the gate
     accounts = (try? await accountStore.accounts()) ?? []
+    isBootstrapping = false
+
+    // Phase 2: activate the account and fetch domains (network — the domain
+    // list shows its own spinner inside MainSplitView)
     let target =
       accounts.first { $0.id == preferences.currentAccountID } ?? accounts.first
     if let target {
