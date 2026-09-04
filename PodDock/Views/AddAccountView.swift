@@ -1,7 +1,7 @@
 import SwiftUI
 import DNSPodKit
 
-/// Add account: credentials verified before Keychain.
+/// Add account: credentials verified before storage.
 struct AddAccountView: View {
   @Environment(AppEnvironment.self) private var environment
 
@@ -14,16 +14,20 @@ struct AddAccountView: View {
   private let consoleURL = URL(string: "https://console.dnspod.cn/account/token/token")!
 
   var body: some View {
-    VStack(spacing: 24) {
-      Image(systemName: "dock.rectangle")
-        .font(.system(size: 56))
-        .foregroundStyle(.green)
-
-      Text("Add DNSPod Account").font(.title2.bold())
-      Text("Connect with a DNSPod API Token. It is stored only in this Mac's Keychain.")
-        .font(.callout)
-        .foregroundStyle(.secondary)
-        .multilineTextAlignment(.center)
+    VStack(spacing: 0) {
+      // Compact header
+      VStack(spacing: 8) {
+        Image(systemName: "dock.rectangle")
+          .font(.system(size: 36))
+          .foregroundStyle(.green)
+        Text("Add DNSPod Account").font(.title3.bold())
+        Text("Connect with a DNSPod API Token. It is stored only on this Mac.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+          .multilineTextAlignment(.center)
+      }
+      .padding(.top, 20)
+      .padding(.bottom, 12)
 
       Form {
         Section("DNSPod API Token") {
@@ -46,26 +50,32 @@ struct AddAccountView: View {
         }
       }
       .formStyle(.grouped)
-      .frame(maxWidth: 520)
 
-      if let errorMessage {
-        Text(errorMessage).foregroundStyle(.red).font(.callout)
-      }
-
-      Button {
-        Task { await submit() }
-      } label: {
-        if isWorking {
-          ProgressView().controlSize(.small)
-        } else {
-          Text("Verify & Add").frame(minWidth: 120)
+      // Error + button pinned to the bottom
+      VStack(spacing: 10) {
+        if let errorMessage {
+          Text(errorMessage)
+            .foregroundStyle(.red)
+            .font(.caption)
+            .lineLimit(2)
         }
+        Button {
+          Task { await submit() }
+        } label: {
+          if isWorking {
+            ProgressView().controlSize(.small)
+          } else {
+            Text("Verify & Add").frame(minWidth: 120)
+          }
+        }
+        .buttonStyle(.borderedProminent)
+        .disabled(tokenID.isEmpty || tokenKey.isEmpty || isWorking)
       }
-      .buttonStyle(.borderedProminent)
-      .disabled(tokenID.isEmpty || tokenKey.isEmpty || isWorking)
+      .padding(.top, 10)
+      .padding(.bottom, 16)
     }
-    .padding(32)
-    .frame(minWidth: 560, minHeight: 640)
+    .frame(minWidth: 480, idealWidth: 520, maxWidth: 560)
+    .fixedSize(horizontal: false, vertical: true)
   }
 
   private func submit() async {
