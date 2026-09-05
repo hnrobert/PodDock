@@ -36,7 +36,7 @@ The pipeline (`.github/workflows/release.yml`) triggers on `v*` tags. Three jobs
 | --- | --- |
 | `setup` | Version (from the tag) + generated release notes (commit list + compare link) |
 | `build` | `PodDock-v<version>-macOS.zip` — ad-hoc signed, arm64 only, published as a **non-draft** release |
-| `mcp-image` | `ghcr.io/<owner>/PodDock/poddock-mcp` — `linux/amd64` Docker image |
+| `mcp-image` | `ghcr.io/<owner>/poddock-mcp` — `linux/amd64` Docker image |
 
 ### Secrets (2)
 
