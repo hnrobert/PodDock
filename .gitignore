@@ -66,4 +66,4 @@ fastlane/test_output
 
 # Release workflow local-run artifacts
 /build/
-PodDock-macOS-arm64.zip
+PodDock-v*-macOS.zip

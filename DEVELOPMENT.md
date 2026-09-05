@@ -30,24 +30,24 @@ Reload the window afterwards for full completion/jump-to/diagnostics across both
 
 ## Releasing
 
-The pipeline (`.github/workflows/release.yml`) triggers on `v*` tags.
+The pipeline (`.github/workflows/release.yml`) triggers on `v*` tags. Three jobs:
 
 | Job | Output |
 | --- | --- |
-| `app` | `PodDock-macOS-arm64.zip` — signed with your Apple Development certificate, arm64 only |
-| `mcp-image` | `ghcr.io/<owner>/PodDock/poddock-mcp` — multi-arch (amd64 + arm64) Docker image, authenticated with the built-in `GITHUB_TOKEN` |
+| `setup` | Version (from the tag) + generated release notes (commit list + compare link) |
+| `build` | `PodDock-v<version>-macOS.zip` — ad-hoc signed, arm64 only, published as a **non-draft** release |
+| `mcp-image` | `ghcr.io/<owner>/PodDock/poddock-mcp` — `linux/amd64` Docker image |
 
-### Secrets (3)
+### Secrets (2)
 
 Add them under **Settings → Secrets and variables → Actions**:
 
 | Secret | Value |
 | --- | --- |
 | `APPLE_CERTIFICATE_BASE64` | Your Apple Development certificate `.p12`, base64-encoded: `base64 -i cert.p12 \| pbcopy` |
-| `APPLE_CERTIFICATE_PASSWORD` | The password set when exporting that `.p12`. **If the `.p12` has no password, skip this secret entirely** — GitHub rejects empty secrets, and an unset secret evaluates to the empty string, which is exactly what the import step passes |
-| `KEYCHAIN_PASSWORD` | Any random string (`openssl rand -hex 20`) — password of the throwaway CI keychain |
+| `APPLE_CERTIFICATE_PASSWORD` | The password set when exporting that `.p12`. **If the `.p12` has no password, skip this secret entirely** — an unset secret evaluates to the empty string, which is exactly what the import step passes |
 
-The team ID is parsed automatically from the imported certificate; no separate secret for it. No Apple ID or app-specific password is needed — signing alone does not involve them.
+The CI keychain itself uses an empty password; no `KEYCHAIN_PASSWORD` secret is needed. No Apple ID or app-specific password is involved.
 
 ### Obtaining the certificate (Keychain Access)
 
@@ -61,29 +61,43 @@ Verify and export it:
    - Check the expiry date in the cert details; anything in the future is fine.
 3. Select **both** the certificate **and** its private key (⌘-click), then **File → Export Items**.
    - Format: **Personal Information Exchange (.p12)**
-   - Setting a password is optional (see the secrets table above for the no-password case).
-4. Verify the export with the same operation CI performs — a scratch-keychain import. This is the authoritative test; `openssl pkcs12` is **not** reliable here because macOS Keychain exports use legacy RC2 encryption that OpenSSL 3 rejects even for perfectly valid files:
+4. Verify the export with a scratch-keychain import (the same operation CI performs). This is the authoritative test; `openssl pkcs12` is **not** reliable here because macOS Keychain exports use legacy RC2 encryption that OpenSSL 3 rejects even for perfectly valid files:
 
-```bash
-security create-keychain -p t /tmp/t.keychain
-security import Certificates.p12 -k /tmp/t.keychain -P "" -T /usr/bin/codesign
-security find-identity -v -p codesigning /tmp/t.keychain
-security delete-keychain /tmp/t.keychain
-```
+   ```bash
+   security create-keychain -p t /tmp/t.keychain
+   security import Certificates.p12 -k /tmp/t.keychain -P "<password>" -T /usr/bin/codesign
+   security find-identity -v -p codesigning /tmp/t.keychain
+   security delete-keychain /tmp/t.keychain
+   ```
 
-The middle command must print `1 identity imported`, and the listing must show `1 valid identities found` with your `Apple Development: …` name. Anything else — most commonly `0 valid identities` — means the export lacks the private key: redo step 3 making sure the **key** is selected too.
+   The middle command must print `1 identity imported`, and the listing must show `1 valid identities found` with your `Apple Development: …` name. Anything else — most commonly `0 valid identities` — means the export lacks the private key: redo step 3 making sure the **key** is selected too.
 
 5. Encode it:
 
-```bash
-base64 -i ~/Desktop/certificate.p12 | pbcopy   # macOS clipboard; paste into APPLE_CERTIFICATE_BASE64
-```
+   ```bash
+   base64 -i ~/Desktop/certificate.p12 | pbcopy   # macOS clipboard; paste into APPLE_CERTIFICATE_BASE64
+   ```
 
-The result is one long single line — make sure no line breaks got pasted in.
+   The result is one long single line — make sure no line breaks got pasted in.
 
 **No usable certificate in Keychain?** Have Xcode create one: Xcode → Settings → Accounts → select your Apple ID → **Manage Certificates…** → **+** → **Apple Development**. This revokes and re-issues on the current Mac, so export the fresh cert afterwards and update the secret.
 
 **Renewal:** these certificates are valid for roughly a year. Xcode renews them transparently when they expire — when that happens, re-export the new `.p12` and update `APPLE_CERTIFICATE_BASE64` / `APPLE_CERTIFICATE_PASSWORD`.
+
+### Signing model (and why the app stays ad-hoc)
+
+The certificate is imported in CI but the **archive itself stays ad-hoc** (the identity `-` is baked into the pbxproj for the macOS SDK). This is deliberate:
+
+- **Ad-hoc** → Gatekeeper puts a quarantined download in the "unverified developer" bucket: blocked on first launch, but **Open Anyway** appears in System Settings → Privacy & Security, so recipients can open it.
+- **Apple Development certificate** → Gatekeeper rejects the signature as invalid *for distribution*: the download is reported as **"damaged, move to Trash"** with **no bypass at all**. (Empirically confirmed 2026-09-05: the cert-signed zip could not be opened; the ad-hoc zip opens via Settings.)
+- **Developer ID + notarization** → the real fix, but requires a paid Apple Developer Program membership. If you join one day: set `CODE_SIGN_IDENTITY[sdk=macosx*]` to `"Developer ID Application"` (the cert import step is already in place) and add `notarytool`.
+
+### First launch (recipients)
+
+On macOS 15+ right-click → Open no longer bypasses Gatekeeper. Use one of:
+
+1. **System Settings → Privacy & Security** — after the first blocked launch attempt, scroll down and click **Open Anyway** (仍要打开).
+2. Terminal: `xattr -dr com.apple.quarantine ~/Downloads/PodDock.app`, then open normally.
 
 ### Cutting a release
 
