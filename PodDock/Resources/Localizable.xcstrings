@@ -1041,6 +1041,9 @@
         }
       }
     },
+    "Record Type" : {
+
+    },
     "Records stop resolving immediately. This cannot be undone." : {
       "localizations" : {
         "zh-Hans" : {
