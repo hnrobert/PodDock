@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- PodDock logo — minimal tech variant, light tile. All geometry original. -->
+  <defs>
+    <linearGradient id="tileLight" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f2fbf4"/>
+      <stop offset="1" stop-color="#d7f0dd"/>
+    </linearGradient>
+    <radialGradient id="glowLight" cx="0.5" cy="0.42" r="0.55">
+      <stop offset="0" stop-color="#34c759" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#34c759" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="dotLight" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#30d158"/>
+      <stop offset="1" stop-color="#21823c"/>
+    </linearGradient>
+    <linearGradient id="beamLight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#34c759" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#34c759" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="1024" rx="232" fill="url(#tileLight)"/>
+  <rect width="1024" height="1024" rx="232" fill="url(#glowLight)"/>
+
+  <rect x="504" y="556" width="16" height="112" rx="8" fill="url(#beamLight)"/>
+
+  <rect x="232" y="668" width="560" height="108" rx="54" fill="#10231a"/>
+  <circle cx="382" cy="722" r="34" fill="url(#dotLight)"/>
+  <circle cx="642" cy="722" r="34" fill="url(#dotLight)"/>
+
+  <circle cx="512" cy="500" r="48" fill="url(#dotLight)"/>
+  <circle cx="512" cy="500" r="48" fill="none" stroke="#34c759" stroke-opacity="0.35" stroke-width="3"/>
+</svg>

@@ -5,6 +5,9 @@ Everything for building, hacking on and releasing PodDock: local builds, IDE set
 ## Building
 
 ```bash
+# One-time: generate app icons (not committed; CI does this automatically)
+swift scripts/generate-app-icons.swift
+
 # DNSPodKit unit tests (fast lane)
 cd DNSPodKit && swift test
 

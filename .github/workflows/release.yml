@@ -89,6 +89,10 @@ jobs:
         with:
           xcode-version: latest-stable
 
+      # App icon PNGs are generated, not committed (see scripts/ and .gitignore)
+      - name: Generate app icons
+        run: swift scripts/generate-app-icons.swift
+
       - name: Set up signing
         env:
           APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}

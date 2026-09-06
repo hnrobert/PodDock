@@ -1,5 +1,9 @@
 # PodDock
 
+<p align="center">
+  <img src="docs/logo/poddock-logo.svg" width="128" alt="PodDock logo">
+</p>
+
 Native DNSPod client in Swift: a macOS/iOS app plus an independently deployable MCP server — one codebase, three delivery forms.
 
 ## Features

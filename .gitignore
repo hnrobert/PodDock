@@ -67,3 +67,8 @@ fastlane/test_output
 # Release workflow local-run artifacts
 /build/
 PodDock-v*-macOS.zip
+
+# Generated app icons (CI runs scripts/generate-app-icons.swift before builds)
+PodDock/Resources/Assets.xcassets/AppIcon.appiconset/*.png
+# docs/logo PNG exports are generated on demand from the SVGs (see docs/logo/README.md)
+docs/logo/*.png

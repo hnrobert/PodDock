@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- PodDock mark — bare, no tile, no text. Transparent background.
+       Black tray reads on both light and dark docks. All geometry original. -->
+  <defs>
+    <linearGradient id="dot" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#30d158"/>
+      <stop offset="1" stop-color="#21823c"/>
+    </linearGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#34c759" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#34c759" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- docking beam -->
+  <rect x="504" y="556" width="16" height="116" rx="8" fill="url(#beam)"/>
+
+  <!-- tray -->
+  <rect x="232" y="668" width="560" height="108" rx="54" fill="#101b14"/>
+  <circle cx="382" cy="722" r="34" fill="url(#dot)"/>
+  <circle cx="642" cy="722" r="34" fill="url(#dot)"/>
+
+  <!-- the pod docking right now -->
+  <circle cx="512" cy="500" r="48" fill="url(#dot)"/>
+  <circle cx="512" cy="500" r="48" fill="none" stroke="#34c759" stroke-opacity="0.35" stroke-width="3"/>
+</svg>
