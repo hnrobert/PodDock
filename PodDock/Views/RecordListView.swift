@@ -93,6 +93,8 @@ struct RecordListView: View {
       Task { await model.toggle(record) }
     }
     .tag(record.id)
+    // Double-click opens the edit sheet (single click still selects via the List)
+    .onTapGesture(count: 2) { editingRecord = record }
     .contextMenu {
       Button("Edit…") { editingRecord = record }
       Button("Remark…") {

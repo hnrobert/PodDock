@@ -17,10 +17,8 @@ struct DomainListView: View {
     List(selection: $selection) {
       Section {
         ForEach(model.filteredDomains) { domain in
-          DomainRowView(domain: domain) {
-            Task { await model.toggle(domain) }
-          }
-          .tag(domain.id)
+          DomainRowView(domain: domain)
+            .tag(domain.id)
           .contextMenu {
             Button(domain.state == .enable ? "Pause DNS" : "Resume DNS") {
               Task { await model.toggle(domain) }
@@ -107,15 +105,23 @@ struct DomainListView: View {
 
 private struct DomainRowView: View {
   let domain: DNSDomain
-  let onToggle: () -> Void
+
+  /// Non-active states just dim the row; enable/disable lives in the context menu
+  private var isDimmed: Bool { domain.state != .enable }
 
   var body: some View {
     HStack(spacing: 10) {
       VStack(alignment: .leading, spacing: 3) {
-        Text(domain.name).font(.body.weight(.medium)).textSelection(.enabled)
+        Text(domain.name)
+          .font(.body.weight(.medium))
+          .textSelection(.enabled)
+          .foregroundStyle(isDimmed ? Color.secondary : Color.primary)
         HStack(spacing: 8) {
           Text("\(domain.recordCount) records")
-          Text(domain.grade).foregroundStyle(.secondary)
+          Text(domain.grade)
+          if isDimmed {
+            Text(DomainStateText.label(for: domain.state))
+          }
           if !domain.updatedOn.isEmpty {
             Text(domain.updatedOn).foregroundStyle(.tertiary)
           }
@@ -124,16 +130,6 @@ private struct DomainRowView: View {
         .foregroundStyle(.secondary)
       }
       Spacer()
-      StatusBadge(state: domain.state)
-      // Inline toggle (disabled for spam/lock/unknown)
-      Toggle("", isOn: Binding(
-        get: { domain.state == .enable },
-        set: { _ in onToggle() }
-      ))
-      .toggleStyle(.switch)
-      .labelsHidden()
-      .disabled(domain.state == .spam || domain.state == .lock || domain.state == .unknown)
-      .help(domain.state == .enable ? "Click to pause" : "Click to enable")
     }
     .padding(.vertical, 2)
     .accessibilityIdentifier("domain-row-\(domain.id.rawValue)")

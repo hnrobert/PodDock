@@ -9,12 +9,12 @@
 /* Begin PBXBuildFile section */
 		888888888888888888888888 /* DNSPodKit in Frameworks */ = {isa = PBXBuildFile; productRef = 777777777777777777777777 /* DNSPodKit */; };
 		888888888888888888888889 /* PodDockMCP in Frameworks */ = {isa = PBXBuildFile; productRef = 777777777777777777777778 /* PodDockMCP */; };
-		FFFFFFFFFFFFFFFFFFFFFFFF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EEEEEEEEEEEEEEEEEEEEEEEE /* Assets.xcassets */; };
+		FFFFFFFFFFFFFFFFFFFFFFFF /* PodDock/Resources/Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EEEEEEEEEEEEEEEEEEEEEEEE /* PodDock/Resources/Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		333333333333333333333333 /* PodDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PodDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		EEEEEEEEEEEEEEEEEEEEEEEE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.asset-catalog; path = PodDock/Resources/Assets.xcassets; sourceTree = "<group>"; };
+		EEEEEEEEEEEEEEEEEEEEEEEE /* PodDock/Resources/Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.asset-catalog"; path = PodDock/Resources/Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -53,7 +53,7 @@
 			isa = PBXGroup;
 			children = (
 				BBBBBBBBBBBBBBBBBBBBBBBB /* PodDock */,
-				EEEEEEEEEEEEEEEEEEEEEEEE /* Assets.xcassets */,
+				EEEEEEEEEEEEEEEEEEEEEEEE /* PodDock/Resources/Assets.xcassets */,
 				555555555555555555555555 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -134,7 +134,7 @@
 		999999999999999999999993 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
-				FFFFFFFFFFFFFFFFFFFFFFFF /* Assets.xcassets in Resources */,
+				FFFFFFFFFFFFFFFFFFFFFFFF /* PodDock/Resources/Assets.xcassets in Resources */,
 			);
 		};
 /* End PBXResourcesBuildPhase section */
