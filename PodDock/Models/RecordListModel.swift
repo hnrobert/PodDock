@@ -41,8 +41,20 @@ final class RecordListModel {
   /// Batch progress
   private(set) var isBatchRunning = false
 
+  /// Last-loaded records per domain — switching domains shows the cache
+  /// instantly (stale-while-revalidate) while load() refreshes in background
+  private var cache: [DomainID: [DNSRecord]] = [:]
+  /// Increments per load(); completions from superseded loads are dropped.
+  /// Without it, the `!isLoading` race between a cancelled task's cleanup and
+  /// the next task's start could leave a domain switch never loading.
+  private var loadGeneration = 0
+
   func attach(environment: AppEnvironment, domain: DNSDomain) {
     self.environment = environment
+    if self.domain?.id != domain.id {
+      records = cache[domain.id] ?? []
+      errorMessage = nil
+    }
     self.domain = domain
   }
 
@@ -85,19 +97,27 @@ final class RecordListModel {
   }
 
   func load() async {
-    guard let client = environment?.client, let domain, !isLoading else { return }
+    guard let client = environment?.client, let domain else { return }
+    loadGeneration += 1
+    let generation = loadGeneration
     isLoading = true
     errorMessage = nil
-    defer { isLoading = false }
+    defer { if generation == loadGeneration { isLoading = false } }
     do {
       let page = try await client.listRecords(domainID: domain.id)
+      guard generation == loadGeneration else { return }
       records = page.records
+      cache[domain.id] = page.records
+    } catch is CancellationError {
+      // Domain switched mid-flight; the newer load owns the UI now
     } catch let error as DNSPodError {
+      guard generation == loadGeneration else { return }
       if error.isAuthenticationFailure, let environment {
         await environment.handleAuthenticationFailure()
       }
       errorMessage = describeError(error)
     } catch {
+      guard generation == loadGeneration else { return }
       errorMessage = describeError(error)
     }
   }
@@ -118,6 +138,10 @@ final class RecordListModel {
     do {
       try await client.removeRecord(id: record.id, domainID: domain.id)
       records.removeAll { $0.id == record.id }
+      if var cached = cache[domain.id] {
+        cached.removeAll { $0.id == record.id }
+        cache[domain.id] = cached
+      }
     } catch {
       errorMessage = describeError(error)
     }

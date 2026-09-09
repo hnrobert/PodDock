@@ -23,6 +23,7 @@ struct RecordListView: View {
     listPane
       .task(id: domain.id) {
         model.attach(environment: environment, domain: domain)
+        selection.removeAll()  // stale RecordIDs from the previous domain
         await model.load()
         #if DEBUG
           FileHandle.standardError.write(Data("[PodDock] RecordListView loaded \(model.records.count) records for \(domain.name)\n".utf8))
@@ -61,7 +62,11 @@ struct RecordListView: View {
 
   /// List pane (List + overlay + nav + toolbar + filter bar) — split out to avoid type-check timeouts
   private var listPane: some View {
-    List(selection: isSelecting ? $selection : .constant(Set<RecordID>())) {
+    // Always a live selection: a plain click highlights the row (accent color);
+    // multi-select (cmd/shift-click) and the batch buttons still live behind
+    // the Select toggle. The empty-selection dance from before made plain
+    // clicks show no highlight at all.
+    List(selection: $selection) {
       ForEach(model.filteredRecords) { record in
         recordRow(record)
       }
@@ -93,8 +98,13 @@ struct RecordListView: View {
       Task { await model.toggle(record) }
     }
     .tag(record.id)
-    // Double-click opens the edit sheet (single click still selects via the List)
-    .onTapGesture(count: 2) { editingRecord = record }
+    // Double-click opens the edit sheet. macOS Lists swallow a bare count-2
+    // tap gesture, so: cover the whole row with a content shape, run the
+    // gesture simultaneously (the List keeps its own selection handling),
+    // and add an empty single-tap primer so the double-tap can win.
+    .contentShape(.rect)
+    .simultaneousGesture(TapGesture(count: 2).onEnded { editingRecord = record })
+    .simultaneousGesture(TapGesture(count: 1).onEnded { })
     .contextMenu {
       Button("Edit…") { editingRecord = record }
       Button("Remark…") {
