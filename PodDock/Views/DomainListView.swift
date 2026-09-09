@@ -20,6 +20,7 @@ struct DomainListView: View {
           DomainRowView(domain: domain)
             .tag(domain.id)
           .contextMenu {
+            Button("Copy Domain") { copyToPasteboard(domain.name) }
             Button(domain.state == .enable ? "Pause DNS" : "Resume DNS") {
               Task { await model.toggle(domain) }
             }
@@ -114,7 +115,7 @@ private struct DomainRowView: View {
       VStack(alignment: .leading, spacing: 3) {
         Text(domain.name)
           .font(.body.weight(.medium))
-          .textSelection(.enabled)
+          // No .textSelection: it swallows clicks and breaks sidebar selection
           .foregroundStyle(isDimmed ? Color.secondary : Color.primary)
         HStack(spacing: 8) {
           Text("\(domain.recordCount) records")

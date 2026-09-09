@@ -1,5 +1,8 @@
 import SwiftUI
 import DNSPodKit
+#if canImport(AppKit)
+  import AppKit
+#endif
 
 /// Record list: search/type filter/sort/multi-select batch (sequential + throttled)/quick remark/toggle/remove (confirmed).
 struct RecordListView: View {
@@ -62,10 +65,9 @@ struct RecordListView: View {
 
   /// List pane (List + overlay + nav + toolbar + filter bar) — split out to avoid type-check timeouts
   private var listPane: some View {
-    // Always a live selection: a plain click highlights the row (accent color);
-    // multi-select (cmd/shift-click) and the batch buttons still live behind
-    // the Select toggle. The empty-selection dance from before made plain
-    // clicks show no highlight at all.
+    // Native List selection: the system draws the rounded-capsule highlight.
+    // The tap gestures below keep the selection set reliably populated
+    // (plain click selects; cmd/shift toggles for batch mode).
     List(selection: $selection) {
       ForEach(model.filteredRecords) { record in
         recordRow(record)
@@ -98,14 +100,25 @@ struct RecordListView: View {
       Task { await model.toggle(record) }
     }
     .tag(record.id)
-    // Double-click opens the edit sheet. macOS Lists swallow a bare count-2
-    // tap gesture, so: cover the whole row with a content shape, run the
-    // gesture simultaneously (the List keeps its own selection handling),
-    // and add an empty single-tap primer so the double-tap can win.
+    // Double-click opens the edit sheet; single click selects the row.
+    // contentShape covers the whole row; gestures run simultaneously so the
+    // List (multi-select in Select mode) keeps its own handling.
     .contentShape(.rect)
     .simultaneousGesture(TapGesture(count: 2).onEnded { editingRecord = record })
-    .simultaneousGesture(TapGesture(count: 1).onEnded { })
+    .simultaneousGesture(TapGesture(count: 1).onEnded {
+      // Plain click selects just this row; cmd/shift-click toggles membership
+      // (multi-select works even where the List's own click handling doesn't)
+      #if os(macOS)
+        let flags = NSEvent.modifierFlags.intersection(.deviceIndependentFlagsMask)
+        if flags.contains(.command) || flags.contains(.shift) {
+          if selection.contains(record.id) { selection.remove(record.id) } else { selection.insert(record.id) }
+          return
+        }
+      #endif
+      selection = [record.id]
+    })
     .contextMenu {
+      Button("Copy Value") { copyToPasteboard(record.value) }
       Button("Edit…") { editingRecord = record }
       Button("Remark…") {
         remarkRecord = record
@@ -251,7 +264,9 @@ private struct RecordRowView: View {
             .background(Color.accentColor.opacity(0.12), in: Capsule())
           Text(record.line).font(.caption).foregroundStyle(.secondary)
         }
-        Text(record.value).font(.callout).foregroundStyle(.secondary).textSelection(.enabled)
+        // No .textSelection here: selectable text swallows clicks and breaks
+        // row selection on macOS — copying lives in the context menu instead
+        Text(record.value).font(.callout).foregroundStyle(.secondary)
         if !record.remark.isEmpty {
           Text("Remark: \(record.remark)").font(.caption).foregroundStyle(.tertiary)
         }

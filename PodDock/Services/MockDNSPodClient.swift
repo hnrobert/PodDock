@@ -11,6 +11,21 @@ import DNSPodKit
     /// When true, the next call throws an auth failure (UI-test scenario: --uitest-scenario auth_failure)
     var failNextCall = false
 
+    /// Simulated network latency in milliseconds (--uitest-latency 1500):
+    /// lets tests reproduce click-during-load races the instant mock never hits
+    private let latencyMs: UInt64 = {
+      let args = ProcessInfo.processInfo.arguments
+      guard let i = args.firstIndex(of: "--uitest-latency"), i + 1 < args.count,
+            let ms = UInt64(args[i + 1]) else { return 0 }
+      return ms
+    }()
+
+    private func simulateNetwork() async {
+      if latencyMs > 0 {
+        try? await Task.sleep(for: .milliseconds(latencyMs))
+      }
+    }
+
     private(set) var domains: [DNSDomain]
     private var recordsByDomain: [String: [DNSRecord]]
 
@@ -85,6 +100,7 @@ import DNSPodKit
 
     func listRecords(domainID: DomainID) async throws -> RecordListPage {
       try maybeFail()
+      await simulateNetwork()
       let records = recordsByDomain[domainID.rawValue] ?? []
       guard let domain = domains.first(where: { $0.id == domainID }) else {
         throw DNSPodError.invalidResponse("mock: 未知域名 \(domainID)")
